@@ -1,0 +1,5 @@
+dnspython3==1.12.0
+paramiko==1.15.2
+requests==2.7.0
+Django==1.8.4
+sqlalchemy==1.0.8
