@@ -104,7 +104,7 @@ class ServiceCheck(Base):
 
     check_type = Column('type', String(50))
 
-    results = relationship('CheckResult', backref='check')
+    results = relationship('CheckResult', backref='check', lazy='noload')
     __mapper_args__ = {'polymorphic_on': check_type}
 
 

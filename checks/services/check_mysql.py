@@ -9,7 +9,7 @@ from checks.service_checks import Service, CheckResult, ServiceCheck
 class MysqlService(Service):
 
     __mapper_args__ = {'polymorphic_identity': 'mysql'}
-    checks = relationship('MysqlCheck', backref='checks')
+    checks = relationship('MysqlCheck', backref='service')
 
     def __init__(self, host, port=3306):
         Service.__init__(self, host, port)
@@ -71,3 +71,6 @@ class MysqlCheck(ServiceCheck):
     def __init__(self, database, table):
         self.database = database
         self.table = table
+
+    def __str__(self):
+        return '<MysqlCheck of %s/%s.%s>' % (self.service.host, self.database, self.table)

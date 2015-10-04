@@ -6,9 +6,9 @@ from sqlalchemy.orm import relationship
 from checks.service_checks import Service, CheckResult, ServiceCheck
 
 
+
 # Disable the warning about self-signed certs
 import requests.packages.urllib3
-from configuration.persistence import Base
 
 requests.packages.urllib3.disable_warnings()
 
@@ -18,7 +18,7 @@ DEFAULT_PORTS = {'http': 80, 'https': 443}
 class WebService(Service):
 
     __mapper_args__ = {'polymorphic_identity': 'web'}
-    checks = relationship('WebCheck', backref='checks')
+    checks = relationship('WebCheck', backref='service')
 
     def __init__(self, host, port=None):
         Service.__init__(self, host, port)
@@ -78,4 +78,4 @@ class WebCheck(ServiceCheck):
         self.check_mode = check_mode
 
     def __str__(self):
-        return '<%s WebCheck of page \'%s\' looking for %s>' % (self.protocol, self.path, self.content)
+        return '<WebCheck of \'%s\' for %s>' % (self.service.get_url(self), self.content)

@@ -5,13 +5,12 @@ import paramiko
 from sqlalchemy.orm import relationship
 
 from checks.service_checks import Service, CheckResult, ServiceCheck
-from configuration.persistence import Base
 
 
 class SshService(Service):
     __mapper_args__ = {'polymorphic_identity': 'ssh'}
 
-    checks = relationship('SshCheck', backref='checks')
+    checks = relationship('SshCheck', backref='service')
 
     def __init__(self, host, port=22):
         Service.__init__(self, host, port)
@@ -55,3 +54,6 @@ class SshCheck(ServiceCheck):
 
     def __init__(self, command):
         self.command = command
+
+    def __str__(self):
+        return '<SshCheck of \'%s\' %s>' % (self.service.host, self.command)

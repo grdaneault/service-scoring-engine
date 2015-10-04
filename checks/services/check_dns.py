@@ -3,14 +3,13 @@ from sqlalchemy import Column, Boolean, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
 from checks.service_checks import Service, CheckResult, ServiceCheck
-from configuration.persistence import Base
 
 
 class DnsService(Service):
 
     __mapper_args__ = {'polymorphic_identity': 'dns'}
 
-    checks = relationship('DnsCheck', backref='checks')
+    checks = relationship('DnsCheck', backref='service')
 
     def __init__(self, host, port=53):
         Service.__init__(self, host, port)
@@ -63,5 +62,6 @@ class DnsCheck(ServiceCheck):
             raise ValueError('strict match requires an IP')
 
     def __str__(self):
-        return '[DNS lookup of %s]' % self.hostname
+        strict_str = self.ip if self.strict_match else "non-strict"
+        return '<DnsCheck of %s \'%s\' (%s)>' % (self.service.host, strict_str, self.hostname)
 
