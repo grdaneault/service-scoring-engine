@@ -2,7 +2,7 @@ import dns.resolver
 from sqlalchemy import Column, Boolean, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
-from checks.service_checks import Service, CheckResult
+from checks.service_checks import Service, CheckResult, ServiceCheck
 from configuration.persistence import Base
 
 
@@ -15,7 +15,7 @@ class DnsService(Service):
     def __init__(self, host, port=53):
         Service.__init__(self, host, port)
 
-    def check(self, check, credentials=None):
+    def run_check(self, check, credentials=None):
         resolver = dns.resolver.Resolver()
         resolver.nameservers = [self.host]
         resolver.timeout = 2
@@ -44,11 +44,11 @@ class DnsService(Service):
             return CheckResult(True, '%s resolved %s correctly' % (self.host, check.hostname))
 
 
-class DnsCheck(Base):
+class DnsCheck(ServiceCheck):
     __tablename__ = 'check_detail_dns'
+    __mapper_args__ = {'polymorphic_identity': 'dns'}
 
-    id = Column(Integer, primary_key=True)
-    service_id = Column(Integer, ForeignKey('service.id'))
+    dns_check_id = Column('id', Integer, ForeignKey('service_check.id'), primary_key=True)
 
     hostname = Column(String(255))
     ip = Column(String(45))
@@ -61,3 +61,7 @@ class DnsCheck(Base):
 
         if not ip and strict_match:
             raise ValueError('strict match requires an IP')
+
+    def __str__(self):
+        return '[DNS lookup of %s]' % self.hostname
+

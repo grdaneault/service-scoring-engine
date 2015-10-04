@@ -1,13 +1,12 @@
 from sqlalchemy.orm import sessionmaker
-from checks.dns import DnsService, DnsCheck
-from checks.mysql import MysqlService, MysqlCheck
+
 from checks.service_checks import CheckCredentials
-from checks.ssh import SshService, SshCheck
-from checks.web import WebService, WebCheck
+from checks.services.check_dns import DnsService, DnsCheck
+from checks.services.check_mysql import MysqlService, MysqlCheck
+from checks.services.check_ssh import SshService, SshCheck
+from checks.services.check_web import WebService, WebCheck
 from configuration.persistence import Base, engine
 from teams.team import Team
-
-__author__ = 'gregd'
 
 Base.metadata.create_all(engine)
 

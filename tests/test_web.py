@@ -1,6 +1,6 @@
-from checks.web import WebService, WebCheck
-
 import unittest
+
+from checks.services.check_web import WebService, WebCheck
 
 
 class WebTestCase(unittest.TestCase):

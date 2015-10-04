@@ -3,7 +3,7 @@ import requests.exceptions
 from sqlalchemy import Column, Integer, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
 
-from checks.service_checks import Service, CheckResult
+from checks.service_checks import Service, CheckResult, ServiceCheck
 
 
 # Disable the warning about self-signed certs
@@ -20,21 +20,21 @@ class WebService(Service):
     __mapper_args__ = {'polymorphic_identity': 'web'}
     checks = relationship('WebCheck', backref='checks')
 
-    def __init__(self, host, port=80):
+    def __init__(self, host, port=None):
         Service.__init__(self, host, port)
 
     def get_url(self, check):
-        port_str = ':%s' % self.port if self.port != DEFAULT_PORTS[check.protocol] else ""
+        port_str = ':%s' % self.port if self.port and self.port != DEFAULT_PORTS[check.protocol] else ""
         return '%s://%s%s/%s' % (check.protocol, self.host, port_str, check.path)
 
-    def check(self, check, credentials=None):
+    def run_check(self, check, credentials=None):
         try:
             result = requests.get(self.get_url(check), timeout=2, verify=False)
 
-            if check.check_type == WebService.STATUS:
+            if check.check_mode == WebCheck.STATUS:
                 return CheckResult(result.status_code == int(check.content), '%s returned %s (should be %s)' %
                                    (self.get_url(check), result.status_code, check.content))
-            elif check.check_type == WebService.CONTENT_CONTAINS:
+            elif check.check_mode == WebCheck.CONTENT_CONTAINS:
                 if check.content in result.text:
                     return CheckResult(True, '%s contained check content' % self.get_url(check))
                 else:
@@ -42,35 +42,40 @@ class WebService(Service):
             else:
                 return CheckResult(result.status_code == 200, '%s returned %s (should be 200)' %
                                    (self.get_url(check), result.status_code))
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.ConnectionError as e:
             return self.connection_error()
         except requests.exceptions.Timeout:
             return self.timeout()
         except requests.exceptions.TooManyRedirects:
             return self.too_many_redirects(check)
 
+    def __str__(self):
+        return '<Web Server on %s:%s>' % (self.host, self.port)
+
     def too_many_redirects(self, check):
         return CheckResult(False, 'Too many redirects experienced when accessing %s' % self.get_url(check))
 
 
-class WebCheck(Base):
-
+class WebCheck(ServiceCheck):
     __tablename__ = 'check_detail_web'
+    __mapper_args__ = {'polymorphic_identity': 'web'}
 
-    id = Column(Integer, primary_key=True)
-    service_id = Column(Integer, ForeignKey('service.id'))
+    web_check_id = Column('id', Integer, ForeignKey('service_check.id'), primary_key=True)
 
     path = Column(String(255))
     protocol = Column(String(50))
     content = Column(Text)
-    check_type = Column(String(50))
+    check_mode = Column(String(50))
 
     STATUS = 'status'
     CONTENT_CONTAINS = 'contentContains'
     CONTENT_MATCHES = 'contentMatches'
 
-    def __init__(self, protocol, path, content, check_type):
+    def __init__(self, protocol, path, content, check_mode):
         self.protocol = protocol
         self.path = path
         self.content = content
-        self.check_type = check_type
+        self.check_mode = check_mode
+
+    def __str__(self):
+        return '<%s WebCheck of page \'%s\' looking for %s>' % (self.protocol, self.path, self.content)

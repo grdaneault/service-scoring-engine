@@ -3,8 +3,7 @@ from mysql.connector import connect, errorcode
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
-from checks.service_checks import Service, CheckResult
-from configuration.persistence import Base
+from checks.service_checks import Service, CheckResult, ServiceCheck
 
 
 class MysqlService(Service):
@@ -15,7 +14,10 @@ class MysqlService(Service):
     def __init__(self, host, port=3306):
         Service.__init__(self, host, port)
 
-    def check(self, check, credentials=None):
+    def requires_credentials(self, check):
+        return True
+
+    def run_check(self, check, credentials=None):
         """
         Runs a check against the mysql service
 
@@ -25,6 +27,8 @@ class MysqlService(Service):
         :return: CheckResult
         """
         try:
+            if not credentials or not credentials.user or not credentials.password:
+                return self.missing_credentials()
             connection = connect(user=credentials.user,
                                  password=credentials.password,
                                  host=self.host,
@@ -54,11 +58,12 @@ class MysqlService(Service):
             else:
                 return CheckResult(False, 'Mysql error: %s' % err.msg)
 
-class MysqlCheck(Base):
-    __tablename__ = 'check_detail_mysql'
 
-    id = Column(Integer, primary_key=True)
-    service_id = Column(Integer, ForeignKey('service.id'))
+class MysqlCheck(ServiceCheck):
+    __tablename__ = 'check_detail_mysql'
+    __mapper_args__ = {'polymorphic_identity': 'mysql'}
+
+    mysql_check_id = Column('id', Integer, ForeignKey('service_check.id'), primary_key=True)
 
     database = Column(String(255))
     table = Column(String(255))

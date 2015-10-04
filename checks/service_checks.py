@@ -1,8 +1,9 @@
 import abc
+import datetime
+
 from sqlalchemy import Column, Integer, Boolean, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from configuration.persistence import Base
 
 
@@ -24,7 +25,17 @@ class Service(Base):
         Base.__init__(self, host=host, port=port)
 
     @abc.abstractmethod
-    def check(self, check, credentials=None):
+    def requires_credentials(self, check):
+        """
+        Gets whether the given checks requires credentials to execute
+
+        :param check:
+        :return: True, if needed.  False otherwise.
+        """
+        return False
+
+    @abc.abstractmethod
+    def run_check(self, check, credentials=None):
         """
         Execute the check for scoring
 
@@ -33,6 +44,15 @@ class Service(Base):
         :return:
         """
         return CheckResult()
+
+    def try_check(self, check, credentials=None):
+        if self.requires_credentials(check) and not credentials:
+            result = self.missing_credentials()
+        else:
+            result = self.run_check(check, credentials)
+
+        result.check = check
+        return result
 
     def timeout(self):
         """
@@ -69,10 +89,29 @@ class Service(Base):
         return CheckResult(False, 'Credential Error.  %s:%s is not authorized for system %s' %
                            (credentials.user, credentials.password, self.host))
 
+    def missing_credentials(self):
+        """
+        Helper utility to represent the error when a check requires credentials but the team does not have any stored
+        :return: CheckResult failed
+        """
+        return CheckResult(False, 'Missing Credentials for check on' % self.host)
+
+class ServiceCheck(Base):
+    __tablename__ = 'service_check'
+
+    id = Column(Integer, primary_key=True)
+    service_id = Column(Integer, ForeignKey('service.id'))
+
+    check_type = Column('type', String(50))
+    __mapper_args__ = {'polymorphic_on': check_type}
+
+
 class CheckResult(Base):
     __tablename__ = 'check_result'
 
     id = Column(Integer, primary_key=True)
+    check_id = Column(Integer, ForeignKey('service_check.id'))
+    check_round_id = Column(Integer, ForeignKey('check_round.id'))
 
     success = Column(Boolean)
     message = Column(String(255))
@@ -107,4 +146,11 @@ class CheckRound(Base):
     start = Column(DateTime)
     end = Column(DateTime)
 
-    checks = relationship('CheckResult', backref='check_round')
+    checks = relationship('CheckResult', backref='checks')
+
+    def __init__(self):
+        Base.__init__(self)
+        self.start = datetime.datetime.now()
+
+    def finish(self):
+        self.end = datetime.datetime.now()

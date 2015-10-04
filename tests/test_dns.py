@@ -1,5 +1,4 @@
-from checks.dns import DnsService, DnsCheck
-from checks.service_checks import ServiceCheck
+from checks.services.check_dns import DnsService, DnsCheck
 
 __author__ = 'gregd'
 

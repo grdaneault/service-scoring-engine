@@ -4,18 +4,22 @@ from sqlalchemy import Column, Integer, ForeignKey, String
 import paramiko
 from sqlalchemy.orm import relationship
 
-from checks.service_checks import Service, CheckResult
+from checks.service_checks import Service, CheckResult, ServiceCheck
 from configuration.persistence import Base
 
 
 class SshService(Service):
     __mapper_args__ = {'polymorphic_identity': 'ssh'}
+
     checks = relationship('SshCheck', backref='checks')
 
     def __init__(self, host, port=22):
         Service.__init__(self, host, port)
 
-    def check(self, check, credentials=None):
+    def requires_credentials(self, check):
+        return True
+
+    def run_check(self, check, credentials=None):
         try:
             client = paramiko.SSHClient()
             client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -41,11 +45,11 @@ class SshService(Service):
             return self.refused()
 
 
-class SshCheck(Base):
+class SshCheck(ServiceCheck):
     __tablename__ = 'check_detail_ssh'
+    __mapper_args__ = {'polymorphic_identity': 'ssh'}
 
-    id = Column(Integer, primary_key=True)
-    service_id = Column(Integer, ForeignKey('service.id'))
+    ssh_check_id = Column('id', Integer, ForeignKey('service_check.id'), primary_key=True)
 
     command = Column(String(255))
 
