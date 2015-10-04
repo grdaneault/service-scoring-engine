@@ -22,5 +22,5 @@ class CheckExecutor(threading.Thread):
         result.check = self.check
 
         pass_str = "PASS" if result.success else "FAIL"
-        print('%s - check %s (%s)' % (pass_str, str(self.check), result.reason))
+        print('%s - check %s (%s)' % (pass_str, str(self.check), result.message))
         self.result = result

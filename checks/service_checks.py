@@ -1,7 +1,7 @@
 import abc
 import datetime
 
-from sqlalchemy import Column, Integer, Boolean, String, DateTime
+from sqlalchemy import Column, Integer, Boolean, String, DateTime, Text
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from configuration.persistence import Base
@@ -103,6 +103,8 @@ class ServiceCheck(Base):
     service_id = Column(Integer, ForeignKey('service.id'))
 
     check_type = Column('type', String(50))
+
+    results = relationship('CheckResult', backref='check')
     __mapper_args__ = {'polymorphic_on': check_type}
 
 
@@ -114,11 +116,11 @@ class CheckResult(Base):
     check_round_id = Column(Integer, ForeignKey('check_round.id'))
 
     success = Column(Boolean)
-    message = Column(String(255))
+    message = Column(Text)
 
-    def __init__(self, success=True, reason=''):
+    def __init__(self, success=True, message=''):
         self.success = success
-        self.reason = reason
+        self.message = message
 
     def __eq__(self, other):
         return isinstance(other, CheckResult) \

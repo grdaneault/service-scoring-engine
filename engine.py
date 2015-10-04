@@ -1,15 +1,15 @@
-import threading
 import time
 
 from sqlalchemy.orm import sessionmaker, joinedload
+
 from sqlalchemy.orm import with_polymorphic
 
 from checks.check_executor import CheckExecutor
-from checks.service_checks import CheckRound, Service, ServiceCheck
-from checks.services.check_dns import DnsService, DnsCheck
-from checks.services.check_mysql import MysqlService, MysqlCheck
-from checks.services.check_ssh import SshService, SshCheck
-from checks.services.check_web import WebService, WebCheck
+from checks.service_checks import CheckRound, Service
+from checks.services.check_dns import DnsService
+from checks.services.check_mysql import MysqlService
+from checks.services.check_ssh import SshService
+from checks.services.check_web import WebService
 from configuration.persistence import engine
 from teams.team import Team
 
@@ -20,23 +20,25 @@ class Engine:
         self.Session = sessionmaker(bind=db_engine)
 
         self.session = self.Session(autoflush=False)
+        self.teams = []
 
-        service_poly = with_polymorphic(Service, [DnsService, MysqlService, SshService, WebService], aliased=True)
-        check_poly = with_polymorphic(ServiceCheck, [DnsCheck, MysqlCheck, SshCheck, WebCheck], aliased=True)
-
-        self.teams = self.session.query(Team). \
-            options(
-                joinedload(Team.services.of_type(service_poly))
-            ).all()
+        self.load_teams()
 
         self.rounds = 1
+        self.session.commit()
+
+    def load_teams(self):
+        service_poly = with_polymorphic(Service, [DnsService, MysqlService, SshService, WebService], aliased=True)
+        self.teams = self.session.query(Team). \
+            options(
+            joinedload(Team.services.of_type(service_poly))
+        ).all()
 
     def check_round(self):
 
         check_round = CheckRound()
-        self.session = self.Session()
         self.session.add(check_round)
-        lock = threading.Lock()
+        self.session.commit()
 
         check_threads = []
 
@@ -65,10 +67,12 @@ class Engine:
 
         print('All checks in round %d finished' % self.rounds)
         self.session.commit()
-        print('Flushed session')
+        self.rounds += 1
+        print('Session committed')
 
     def start(self):
         while True:
+            self.load_teams()
             self.check_round()
             time.sleep(30)
 
