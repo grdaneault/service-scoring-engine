@@ -2,6 +2,7 @@ from sqlalchemy.orm import sessionmaker
 
 from checks.service_checks import CheckCredentials
 from checks.services.check_dns import DnsService, DnsCheck
+from checks.services.check_ftp import FtpService, FtpCheck
 from checks.services.check_mysql import MysqlService, MysqlCheck
 from checks.services.check_ssh import SshService, SshCheck
 from checks.services.check_web import WebService, WebCheck
@@ -49,9 +50,16 @@ ssh.credentials.append(CheckCredentials('bob', 'bob'))
 ssh.checks.append(SshCheck('whoami'))
 ssh.checks.append(SshCheck('ls'))
 
+# FTP
+ftp = FtpService('192.168.243.133')
+ftp.credentials.append(CheckCredentials('greg', 'greg'))
+ftp.checks.append(FtpCheck(is_anonymous=False, operation=FtpCheck.UPLOAD))
+ftp.checks.append(FtpCheck(is_anonymous=False, operation=FtpCheck.LIST))
+
 
 blue.services.append(ssh)
 blue.services.append(dns)
+blue.services.append(ftp)
 blue.services.append(http)
 blue.services.append(https)
 blue.services.append(mysql)
