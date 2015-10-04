@@ -1,50 +1,48 @@
-from checks.services.check_mysql import MysqlService
+from checks.services.check_mysql import MysqlService, MysqlCheck
 from checks.service_checks import CheckCredentials
-
-__author__ = 'gregd'
 
 import unittest
 
 
 class MysqlTestCase(unittest.TestCase):
     def test_mysql(self):
-        check = MysqlService('192.168.243.131', 'secret', 'secret_keys')
+        service = MysqlService('192.168.243.131')
         cred = CheckCredentials('root', 'greg')
 
-        result = check.execute(cred)
+        result = service.try_check(MysqlCheck('secret', 'secret_keys'), cred)
 
         self.assertEqual(True, result.success)
-        self.assertEqual('Table secret_keys has data', result.reason)
+        self.assertEqual('Table secret_keys has data', result.message)
 
     def test_mysql_bad_credentials(self):
-        check = MysqlService('192.168.243.131', 'secret', 'secret_keys')
-        cred = CheckCredentials('root', 'badpass')
+        service = MysqlService('192.168.243.131')
+        cred = CheckCredentials('root', 'bad_pass')
 
-        result = check.execute(cred)
-        self.assertEqual(check.invalid_credentials(cred), result)
+        result = service.try_check(MysqlCheck('secret', 'secret_keys'), cred)
+        self.assertEqual(service.invalid_credentials(cred), result)
 
     def test_mysql_empty_table(self):
-        check = MysqlService('192.168.243.131', 'secret', 'red_team_was_here')
+        service = MysqlService('192.168.243.131')
         cred = CheckCredentials('root', 'greg')
 
-        result = check.execute(cred)
+        result = service.try_check(MysqlCheck('secret', 'red_team_was_here'), cred)
         self.assertEqual(False, result.success)
-        self.assertEqual('Table red_team_was_here is empty', result.reason)
+        self.assertEqual('Table red_team_was_here is empty', result.message)
 
     def test_mysql_no_database(self):
-        check = MysqlService('192.168.243.131', 'gone_db', 'secret_keys')
+        service = MysqlService('192.168.243.131')
         cred = CheckCredentials('root', 'greg')
 
-        result = check.execute(cred)
+        result = service.try_check(MysqlCheck('gone_db', 'secret_keys'), cred)
         self.assertEqual(False, result.success)
-        self.assertEqual('Database gone_db does not exist', result.reason)
+        self.assertEqual('Database gone_db does not exist', result.message)
 
     def test_mysql_no_connection(self):
-        check = MysqlService('192.168.243.131', 'secret', 'secret_keys')
+        service = MysqlService('192.168.243.123')
         cred = CheckCredentials('root', 'greg')
 
-        result = check.execute(cred)
-        self.assertEqual(check.connection_error(), result)
+        result = service.try_check(MysqlCheck('secret', 'secret_keys'), cred)
+        self.assertEqual(service.connection_error(), result)
 
 if __name__ == '__main__':
     unittest.main()

@@ -32,9 +32,11 @@ class SshService(Service):
             chan.exec_command(check.command)
             exit_code = chan.recv_exit_status()
             if 0 == exit_code:
-                return CheckResult(True, 'Command %s executed successfully over SSH' % check.command)
+                return CheckResult(True, 'Command %s executed against %s by %s' %
+                                   (check.command, self.host, credentials.user))
             else:
-                return CheckResult(False, 'Command %s exited with code %d' % (check.command, exit_code))
+                return CheckResult(False, 'Command %s exited with code %d when run against %s by %s' %
+                                   (check.command, exit_code, self.host, credentials.user))
 
         except paramiko.ssh_exception.AuthenticationException:
             return self.invalid_credentials(credentials)

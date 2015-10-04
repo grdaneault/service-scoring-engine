@@ -8,7 +8,6 @@ from configuration.persistence import Base
 
 
 class Service(Base):
-
     __tablename__ = 'service'
 
     id = Column(Integer, primary_key=True)
@@ -96,6 +95,7 @@ class Service(Base):
         """
         return CheckResult(False, 'Missing Credentials for check on' % self.host)
 
+
 class ServiceCheck(Base):
     __tablename__ = 'service_check'
 
@@ -125,7 +125,7 @@ class CheckResult(Base):
     def __eq__(self, other):
         return isinstance(other, CheckResult) \
                and self.success == other.success \
-               and self.reason == other.reason
+               and self.message == other.message
 
 
 class CheckCredentials(Base):
@@ -140,6 +140,7 @@ class CheckCredentials(Base):
     def __init__(self, user, password):
         self.user = user
         self.password = password
+
 
 class CheckRound(Base):
     __tablename__ = 'check_round'
