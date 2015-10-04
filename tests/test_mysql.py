@@ -1,10 +1,11 @@
-from checks.services.check_mysql import MysqlService, MysqlCheck
-from checks.service_checks import CheckCredentials
-
 import unittest
 
+from checks.services.check_mysql import MysqlService, MysqlCheck
+from checks.service_checks import CheckCredentials
+from tests.service_test import ServiceTest
 
-class MysqlTestCase(unittest.TestCase):
+
+class MysqlTestCase(ServiceTest):
     def test_mysql(self):
         service = MysqlService('192.168.243.131')
         cred = CheckCredentials('root', 'greg')

@@ -33,7 +33,7 @@ class MysqlService(Service):
                                  password=credentials.password,
                                  host=self.host,
                                  database=check.database,
-                                 connection_timeout=2)
+                                 connection_timeout=Service.TIMEOUT)
 
             cursor = connection.cursor()
 

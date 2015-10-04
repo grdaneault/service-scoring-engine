@@ -8,6 +8,8 @@ from checks.service_checks import CheckCredentials
 # noinspection PyUnresolvedReferences
 from checks.services.check_dns import DnsService, DnsCheck
 # noinspection PyUnresolvedReferences
+from checks.services.check_ftp import FtpService, FtpCheck
+# noinspection PyUnresolvedReferences
 from checks.services.check_mysql import MysqlService, MysqlCheck
 # noinspection PyUnresolvedReferences
 from checks.services.check_ssh import SshService, SshCheck

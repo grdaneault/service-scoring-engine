@@ -29,7 +29,9 @@ class WebService(Service):
 
     def run_check(self, check, credentials=None):
         try:
-            result = requests.get(self.get_url(check), timeout=2, verify=False)
+            result = requests.get(self.get_url(check),
+                                  timeout=Service.TIMEOUT,
+                                  verify=False)
 
             if check.check_mode == WebCheck.STATUS:
                 return CheckResult(result.status_code == int(check.content), '%s returned %s (should be %s)' %

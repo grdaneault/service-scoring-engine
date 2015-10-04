@@ -20,6 +20,8 @@ class Service(Base):
     discriminator = Column('type', String(20))
     __mapper_args__ = {'polymorphic_on': discriminator}
 
+    TIMEOUT = 10
+
     def __init__(self, host, port=None):
         Base.__init__(self, host=host, port=port)
 

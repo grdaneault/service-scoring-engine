@@ -17,8 +17,8 @@ class DnsService(Service):
     def run_check(self, check, credentials=None):
         resolver = dns.resolver.Resolver()
         resolver.nameservers = [self.host]
-        resolver.timeout = 2
-        resolver.lifetime = 2
+        resolver.timeout = Service.TIMEOUT
+        resolver.lifetime = Service.TIMEOUT
 
         try:
             answer = resolver.query(check.hostname)

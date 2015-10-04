@@ -26,7 +26,7 @@ class SshService(Service):
                            port=self.port,
                            username=credentials.user,
                            password=credentials.password,
-                           timeout=2)
+                           timeout=Service.TIMEOUT)
 
             chan = client.get_transport().open_session()
             chan.exec_command(check.command)
