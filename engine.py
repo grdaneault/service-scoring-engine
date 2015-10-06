@@ -65,6 +65,8 @@ class Engine:
             thread.join()
             check_round.checks.append(thread.result)
 
+        check_round.end()
+
         print('All checks in round %d finished' % self.rounds)
         self.session.commit()
         self.rounds += 1
