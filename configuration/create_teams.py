@@ -4,6 +4,7 @@ from checks.service_checks import CheckCredentials
 from checks.services.check_dns import DnsService, DnsCheck
 from checks.services.check_ftp import FtpService, FtpCheck
 from checks.services.check_mysql import MysqlService, MysqlCheck
+from checks.services.check_ping import PingService
 from checks.services.check_ssh import SshService, SshCheck
 from checks.services.check_web import WebService, WebCheck
 from configuration.persistence import Base, engine
@@ -55,6 +56,8 @@ ftp = FtpService('192.168.243.133')
 ftp.credentials.append(CheckCredentials('greg', 'greg'))
 ftp.checks.append(FtpCheck(is_anonymous=False, operation=FtpCheck.UPLOAD))
 ftp.checks.append(FtpCheck(is_anonymous=False, operation=FtpCheck.LIST))
+
+blue.services.append(PingService('8.8.8.8'))
 
 
 blue.services.append(ssh)

@@ -44,6 +44,8 @@ class SshService(Service):
             return self.timeout()
         except ConnectionRefusedError:
             return self.refused()
+        except OSError:
+            return self.connection_error()
 
 
 class SshCheck(ServiceCheck):

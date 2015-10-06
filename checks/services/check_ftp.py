@@ -61,6 +61,8 @@ class FtpService(Service):
             result = CheckResult(False, 'Unexpected server reply from %s' % self.host)
         except ftplib.error_perm as e:
             result = self.invalid_credentials(credentials)
+        except OSError:
+            result = self.connection_error()
 
         if os.path.exists(filename):
             os.remove(filename)

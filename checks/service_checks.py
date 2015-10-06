@@ -129,6 +129,9 @@ class CheckResult(Base):
                and self.success == other.success \
                and self.message == other.message
 
+    def __str__(self):
+        return 'Check<%s, %s>' % (self.success, self.message)
+
 
 class CheckCredentials(Base):
     __tablename__ = 'check_credentials'
