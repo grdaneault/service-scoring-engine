@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Boolean, String, DateTime, Text
+from sqlalchemy import Column, Integer, Boolean, String, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
 
 from configuration.persistence import Base
@@ -19,5 +19,6 @@ class InjectSolve(Base):
     team = relationship('Team')
     inject = relationship('Inject')
     approved = Column(Boolean)
+    approving_user = relationship("User")
     date_requested = Column(DateTime)
     date_approved = Column(DateTime)

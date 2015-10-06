@@ -15,8 +15,9 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
+white = Team(name='White')
 blue = Team(name='Blue')
-
+red = Team(name='Red')
 
 
 # MySQL
