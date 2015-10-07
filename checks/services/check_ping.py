@@ -31,3 +31,7 @@ class PingCheck(ServiceCheck):
 
     ping_id = Column(Integer, primary_key=True)
     host = Column(String(255), nullable=False)
+
+    def __init__(self, host, value=5):
+        ServiceCheck.__init__(self, value=value)
+        self.host = host

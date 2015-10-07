@@ -73,7 +73,8 @@ class WebCheck(ServiceCheck):
     CONTENT_CONTAINS = 'contentContains'
     CONTENT_MATCHES = 'contentMatches'
 
-    def __init__(self, protocol, path, content, check_mode):
+    def __init__(self, protocol, path, content, check_mode, value=10):
+        ServiceCheck.__init__(self, value=value)
         self.protocol = protocol
         self.path = path
         self.content = content

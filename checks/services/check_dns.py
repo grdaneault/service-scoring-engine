@@ -53,7 +53,8 @@ class DnsCheck(ServiceCheck):
     ip = Column(String(45), nullable=True)
     strict_match = Column(Boolean, nullable=False, default=False)
 
-    def __init__(self, hostname, ip, strict_match=True):
+    def __init__(self, hostname, ip, strict_match=True, value=5):
+        ServiceCheck.__init__(self, value=value)
         self.hostname = hostname
         self.ip = ip
         self.strict_match = strict_match
