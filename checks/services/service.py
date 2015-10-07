@@ -1,9 +1,7 @@
 import abc
 
 from sqlalchemy import Column, Integer, String
-
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship
 
 from checks.check import CheckResult
 from configuration.persistence import Base
@@ -16,8 +14,6 @@ class Service(Base):
     team_id = Column(Integer, ForeignKey('team.id'), nullable=False)
     host = Column(String(255), nullable=True)
     port = Column(Integer, nullable=True)
-
-    credentials = relationship('CheckCredentials', backref='service')
 
     discriminator = Column('type', String(20))
     __mapper_args__ = {'polymorphic_on': discriminator}
@@ -93,6 +89,9 @@ class Service(Base):
         :param credentials: The invalid credentials
         :return: CheckResult failed
         """
+        if not credentials:
+            return self.missing_credentials()
+
         return CheckResult(False, 'Credential Error.  %s:%s is not authorized for system %s' %
                            (credentials.user, credentials.password, self.host))
 
@@ -101,6 +100,6 @@ class Service(Base):
         Helper utility to represent the error when a check requires credentials but the team does not have any stored
         :return: CheckResult failed
         """
-        return CheckResult(False, 'Missing Credentials for check on' % self.host)
+        return CheckResult(False, 'Missing Credentials for check on %s' % self.host)
 
 

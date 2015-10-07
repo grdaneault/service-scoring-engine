@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, ForeignKey, String, Boolean, Text
+from sqlalchemy import Column, Integer, ForeignKey, String, Boolean, Text, Table
 from sqlalchemy.orm import relationship
+
 from configuration.persistence import Base
 
 __author__ = 'gregd'
@@ -18,7 +19,14 @@ class ServiceCheck(Base):
     __mapper_args__ = {'polymorphic_on': check_type}
 
     def __init__(self, **kwargs):
+        credentials = kwargs.pop('credentials', [])
+        if credentials is None:
+            credentials = []
+
         Base.__init__(self, **kwargs)
+
+        for credential in credentials:
+            self.credentials.append(credential)
 
 
 class CheckResult(Base):
@@ -43,15 +51,19 @@ class CheckResult(Base):
     def __str__(self):
         return 'Check<%s, %s>' % (self.success, self.message)
 
+credentials_check_relation = Table('check_credential_association', Base.metadata,
+                                   Column('check_id', Integer, ForeignKey('service_check.id')),
+                                   Column('credential_id', Integer, ForeignKey('check_credentials.id'))
+                                   )
 
 class CheckCredentials(Base):
     __tablename__ = 'check_credentials'
 
     id = Column(Integer, primary_key=True)
-
+    team_id = Column(Integer, ForeignKey('team.id'))
     user = Column(String(255), nullable=False)
     password = Column(String(255), nullable=False)
-    service_id = Column(Integer, ForeignKey('service.id'), nullable=False)
+    checks = relationship('ServiceCheck', secondary=credentials_check_relation, backref='credentials')
 
     def __init__(self, user, password):
         self.user = user

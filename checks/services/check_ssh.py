@@ -59,8 +59,8 @@ class SshCheck(ServiceCheck):
 
     command = Column(String(255))
 
-    def __init__(self, command, value=10):
-        ServiceCheck.__init__(self, value=value)
+    def __init__(self, command='whoami', value=10, credentials=None):
+        ServiceCheck.__init__(self, value=value, credentials=credentials)
         self.command = command
 
     def __str__(self):

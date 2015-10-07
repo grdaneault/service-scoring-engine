@@ -21,10 +21,11 @@ white = Team(name='White')
 blue = Team(name='Blue')
 red = Team(name='Red')
 
-def create_mysql_service(server):
+def create_mysql_service(server, credentials):
     mysql = MysqlService(server)
-    mysql.credentials.append(CheckCredentials(user='greg', password='greg'))
-    mysql.checks.append(MysqlCheck('secret', 'secret_keys'))
+    mysql.checks.append(MysqlCheck(database='secret',
+                                   table='secret_keys',
+                                   credentials=credentials))
     return mysql
 
 def create_dns_service(server):
@@ -47,20 +48,17 @@ def create_web_service(server, protocol):
     web.checks.append(WebCheck(protocol, 'not-there.html', 404, WebCheck.STATUS, value=5))
     return web
 
-def create_ssh_service(server):
+def create_ssh_service(server, credentials):
     ssh = SshService(server)
-    ssh.credentials.append(CheckCredentials('greg', 'greg'))
-    ssh.credentials.append(CheckCredentials('jeff', 'jeff'))
-    ssh.credentials.append(CheckCredentials('bob', 'bob'))
-    ssh.checks.append(SshCheck('whoami'))
-    ssh.checks.append(SshCheck('ls'))
+    ssh.checks.append(SshCheck(credentials=credentials))
+    ssh.checks.append(SshCheck(command='ls', credentials=credentials))
     return ssh
 
-def create_ftp_service(server):
+def create_ftp_service(server, credentials):
     ftp = FtpService(server)
-    ftp.credentials.append(CheckCredentials('greg', 'greg'))
-    ftp.checks.append(FtpCheck(is_anonymous=False, operation=FtpCheck.UPLOAD))
-    ftp.checks.append(FtpCheck(is_anonymous=False, operation=FtpCheck.LIST))
+    ftp.checks.append(FtpCheck(is_anonymous=False, operation=FtpCheck.UPLOAD, credentials=credentials))
+    ftp.checks.append(FtpCheck(is_anonymous=False, operation=FtpCheck.LIST, credentials=credentials))
+    ftp.checks.append(FtpCheck(is_anonymous=True, operation=FtpCheck.LIST))
     return ftp
 
 def create_ping_service(network):
@@ -69,12 +67,18 @@ def create_ping_service(network):
         ping.checks.append(PingCheck('192.168.159.1%s' % host))
     return ping
 
+blue_credentials = [
+    CheckCredentials('greg', 'greg'),
+    CheckCredentials('jeff', 'jeff'),
+    CheckCredentials('bob', 'bob')
+]
+
 blue.services.append(create_dns_service('192.168.159.100'))
-blue.services.append(create_ftp_service('ftp.team1.ists'))
+blue.services.append(create_ftp_service('ftp.team1.ists', blue_credentials[1:2]))
 blue.services.append(create_web_service('192.168.159.110', 'http'))
 blue.services.append(create_web_service('www.team1.ists', 'https'))
-blue.services.append(create_ssh_service('ssh.team1.ists'))
-blue.services.append(create_mysql_service('db.team1.ists'))
+blue.services.append(create_ssh_service('ssh.team1.ists', blue_credentials))
+blue.services.append(create_mysql_service('db.team1.ists', blue_credentials[1:1]))
 blue.services.append(create_ping_service('192.168.159.0/24'))
 
 for team in [white, blue, red]:

@@ -71,8 +71,8 @@ class MysqlCheck(ServiceCheck):
     database = Column(String(255), nullable=False)
     table = Column(String(255), nullable=False)
 
-    def __init__(self, database, table, value=10):
-        ServiceCheck.__init__(self, value=value)
+    def __init__(self, database, table, value=10, credentials=None):
+        ServiceCheck.__init__(self, value=value, credentials=credentials)
         self.database = database
         self.table = table
 

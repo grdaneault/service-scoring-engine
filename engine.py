@@ -51,22 +51,15 @@ class Engine:
             check_threads.append((team_round, team_round_threads))
 
             for service in team.services:
-
-                service_credentials = service.credentials
-                credential_index = 0
-                if service.credentials:
-                    credential_index = self.rounds % len(service_credentials)
-
                 for check in service.checks:
-                    credentials = None
-                    if service.requires_credentials(check) and service_credentials:
-                        credentials = service_credentials[credential_index]
-                        credential_index += 1
-                        credential_index %= len(service_credentials)
+                    credentials = [None]
+                    if service.requires_credentials(check) and check.credentials:
+                        credentials = check.credentials
 
-                    check_thread = CheckExecutor(service, check, credentials)
-                    check_thread.start()
-                    team_round_threads.append(check_thread)
+                    for credential in credentials:
+                        check_thread = CheckExecutor(service, check, credential)
+                        check_thread.start()
+                        team_round_threads.append(check_thread)
 
         for team in check_threads:
             for thread in team[1]:

@@ -2,7 +2,7 @@ from flask import Flask
 from flask.ext.user import SQLAlchemyAdapter, UserManager
 from flask_sqlalchemy import SQLAlchemy, _QueryProperty, BaseQuery
 
-from configuration.models import Models
+from configuration.models import create_tables
 from configuration.persistence import Base
 import configuration.web_configuration
 from teams.user import User
@@ -16,7 +16,7 @@ db = SQLAlchemy(app) # Initialize Flask-SQLAlchemy
 # Add needed query support to base class TODO: investigate difference from db.Model
 Base.query = _QueryProperty(db)
 Base.query_class = BaseQuery
-Models.create_tables(db.engine)
+create_tables(db.engine)
 
 # Setup Flask-User
 db_adapter = SQLAlchemyAdapter(db, User)        # Register the User model
