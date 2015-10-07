@@ -1,7 +1,7 @@
 import unittest
+from checks import CheckCredentials
 
 from checks.services.check_mysql import MysqlService, MysqlCheck
-from checks.service_checks import CheckCredentials
 from tests.service_test import ServiceTest
 
 

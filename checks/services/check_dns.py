@@ -1,8 +1,8 @@
 import dns.resolver
 from sqlalchemy import Column, Boolean, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-
-from checks.service_checks import Service, CheckResult, ServiceCheck
+from checks import CheckResult, ServiceCheck
+from checks.services import Service
 
 
 class DnsService(Service):

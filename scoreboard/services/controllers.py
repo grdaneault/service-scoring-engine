@@ -2,8 +2,9 @@
 from flask import Blueprint, render_template
 
 # Import the database object from the main app module
-from checks.service_checks import Service, ServiceCheck, CheckCredentials
 from flask.ext.login import current_user, login_required
+from checks import ServiceCheck, CheckCredentials
+from checks.services import Service
 
 mod_services = Blueprint('services', __name__, url_prefix='/services')
 

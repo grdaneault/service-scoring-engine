@@ -3,8 +3,8 @@ import socket
 from sqlalchemy import Column, Integer, ForeignKey, String
 import paramiko
 from sqlalchemy.orm import relationship
-
-from checks.service_checks import Service, CheckResult, ServiceCheck
+from checks import ServiceCheck, CheckResult
+from checks.services import Service
 
 
 class SshService(Service):

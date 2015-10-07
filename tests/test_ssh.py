@@ -1,4 +1,4 @@
-from checks.service_checks import CheckCredentials
+from checks import CheckCredentials
 from checks.services.check_ssh import SshService, SshCheck
 from tests.service_test import ServiceTest
 

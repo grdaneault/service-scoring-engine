@@ -2,8 +2,8 @@ import mysql.connector
 from mysql.connector import connect, errorcode
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-
-from checks.service_checks import Service, CheckResult, ServiceCheck
+from checks import CheckResult, ServiceCheck
+from checks.services import Service
 
 
 class MysqlService(Service):

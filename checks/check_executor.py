@@ -1,5 +1,5 @@
 import threading
-from checks.service_checks import CheckResult
+from checks import CheckResult
 
 
 class CheckExecutor(threading.Thread):

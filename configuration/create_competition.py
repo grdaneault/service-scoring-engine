@@ -1,18 +1,18 @@
 from sqlalchemy.orm import sessionmaker
+from checks import CheckCredentials
 
-from checks.service_checks import CheckCredentials
 from checks.services.check_dns import DnsService, DnsCheck
 from checks.services.check_ftp import FtpService, FtpCheck
 from checks.services.check_mysql import MysqlService, MysqlCheck
 from checks.services.check_ping import PingService, PingCheck
 from checks.services.check_ssh import SshService, SshCheck
 from checks.services.check_web import WebService, WebCheck
-from configuration.models import Models
+from configuration.models import create_tables
 from scoreboard.app import db, user_manager
 from teams.user import User
 from teams.team import Team
 
-Models.create_tables(db.engine)
+create_tables(db.engine)
 
 Session = sessionmaker(bind=db.engine)
 session = Session()

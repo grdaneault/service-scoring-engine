@@ -1,6 +1,6 @@
 import unittest
+from checks import CheckCredentials
 
-from checks.service_checks import CheckCredentials
 from checks.services.check_ftp import FtpService, FtpCheck
 from tests.service_test import ServiceTest
 

@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template
 
 # Import the database object from the main app module
-from checks.service_checks import CheckRound
+from checks import CheckRound
 
 mod_status = Blueprint('status', __name__)
 

@@ -3,9 +3,10 @@ import time
 from sqlalchemy.orm import sessionmaker, joinedload
 
 from sqlalchemy.orm import with_polymorphic
+from checks import CheckRound, TeamCheckRound
 
 from checks.check_executor import CheckExecutor
-from checks.service_checks import CheckRound, Service, TeamCheckRound
+from checks.services import Service
 from checks.services.check_dns import DnsService
 from checks.services.check_mysql import MysqlService
 from checks.services.check_ssh import SshService

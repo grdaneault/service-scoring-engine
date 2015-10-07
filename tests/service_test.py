@@ -4,7 +4,7 @@ from sqlalchemy.orm.session import Session
 
 # Import all persistence classes so that the proper tables get built for testing
 # noinspection PyUnresolvedReferences
-from checks.service_checks import CheckCredentials
+from checks.services import CheckCredentials
 # noinspection PyUnresolvedReferences
 from checks.services.check_dns import DnsService, DnsCheck
 # noinspection PyUnresolvedReferences

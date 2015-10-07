@@ -2,11 +2,11 @@ import shlex
 import platform
 import subprocess
 
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy.orm import relationship
-
-from checks.service_checks import Service, CheckResult, ServiceCheck, ForeignKey
+from checks import CheckResult, ServiceCheck
+from checks.services import Service
 
 
 class PingService(Service):

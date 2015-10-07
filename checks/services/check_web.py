@@ -3,12 +3,12 @@ import requests.exceptions
 from sqlalchemy import Column, Integer, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
 
-from checks.service_checks import Service, CheckResult, ServiceCheck
-
 
 
 # Disable the warning about self-signed certs
 import requests.packages.urllib3
+from checks import CheckResult, ServiceCheck
+from checks.services import Service
 
 requests.packages.urllib3.disable_warnings()
 
