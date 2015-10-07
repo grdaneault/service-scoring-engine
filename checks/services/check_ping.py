@@ -10,6 +10,9 @@ from checks.service_checks import Service, CheckResult, ServiceCheck, ForeignKey
 
 
 class PingService(Service):
+    def friendly_name(self):
+        return 'Reachable Servers'
+
     __mapper_args__ = {'polymorphic_identity': 'icmp'}
     checks = relationship('PingCheck', backref='service')
 

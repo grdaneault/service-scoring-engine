@@ -10,6 +10,9 @@ from checks.service_checks import Service, CheckResult, ServiceCheck
 
 class FtpService(Service):
 
+    def friendly_name(self):
+        return 'FTP Server'
+
     __mapper_args__ = {'polymorphic_identity': 'ftp'}
     checks = relationship('FtpCheck', backref='service')
 

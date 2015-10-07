@@ -8,7 +8,8 @@ from checks.services.check_ping import PingService, PingCheck
 from checks.services.check_ssh import SshService, SshCheck
 from checks.services.check_web import WebService, WebCheck
 from configuration.models import Models
-from scoreboard.app import db
+from scoreboard.app import db, user_manager
+from teams.user import User
 from teams.team import Team
 
 Models.create_tables(db.engine)
@@ -77,14 +78,12 @@ blue.services.append(create_mysql_service('db.team1.ists'))
 blue.services.append(create_ping_service())
 
 for team in [white, blue, red]:
-    """
     password = team.name + '123'
     user = User(username=team.name.lower(),
                 password=user_manager.hash_password(password),
                 active=True,
                 team=team)
-    """
     session.add(team)
-
+    session.add(user)
 session.commit()
 

@@ -7,6 +7,12 @@ from checks.service_checks import Service, CheckResult, ServiceCheck
 
 class DnsService(Service):
 
+    def requires_credentials(self, check):
+        return False
+
+    def friendly_name(self):
+        return 'DNS Server'
+
     __mapper_args__ = {'polymorphic_identity': 'dns'}
 
     checks = relationship('DnsCheck', backref='service')

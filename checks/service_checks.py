@@ -46,6 +46,10 @@ class Service(Base):
         """
         return CheckResult()
 
+    @abc.abstractstaticmethod
+    def friendly_name(self):
+        return 'Service Check'
+
     def try_check(self, check, credentials=None):
         if self.requires_credentials(check) and not credentials:
             result = self.missing_credentials()
@@ -109,6 +113,9 @@ class ServiceCheck(Base):
 
     results = relationship('CheckResult', backref='check', lazy='noload')
     __mapper_args__ = {'polymorphic_on': check_type}
+
+    def __init__(self, **kwargs):
+        Base.__init__(self, **kwargs)
 
 
 class CheckResult(Base):

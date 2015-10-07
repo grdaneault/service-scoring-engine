@@ -8,6 +8,9 @@ from checks.service_checks import Service, CheckResult, ServiceCheck
 
 class MysqlService(Service):
 
+    def friendly_name(self):
+        return 'MySQL Server'
+
     __mapper_args__ = {'polymorphic_identity': 'mysql'}
     checks = relationship('MysqlCheck', backref='service')
 
@@ -68,7 +71,8 @@ class MysqlCheck(ServiceCheck):
     database = Column(String(255), nullable=False)
     table = Column(String(255), nullable=False)
 
-    def __init__(self, database, table):
+    def __init__(self, database, table, value=10):
+        ServiceCheck.__init__(self, value=value)
         self.database = database
         self.table = table
 

@@ -17,6 +17,12 @@ DEFAULT_PORTS = {'http': 80, 'https': 443}
 
 class WebService(Service):
 
+    def requires_credentials(self, check):
+        return False
+
+    def friendly_name(self):
+        return 'Web Server'
+
     __mapper_args__ = {'polymorphic_identity': 'web'}
     checks = relationship('WebCheck', backref='service')
 

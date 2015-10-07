@@ -8,6 +8,9 @@ from checks.service_checks import Service, CheckResult, ServiceCheck
 
 
 class SshService(Service):
+    def friendly_name(self):
+        return 'SSH Server'
+
     __mapper_args__ = {'polymorphic_identity': 'ssh'}
 
     checks = relationship('SshCheck', backref='service')
@@ -56,7 +59,8 @@ class SshCheck(ServiceCheck):
 
     command = Column(String(255))
 
-    def __init__(self, command):
+    def __init__(self, command, value=10):
+        ServiceCheck.__init__(self, value=value)
         self.command = command
 
     def __str__(self):
