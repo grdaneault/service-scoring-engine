@@ -7,14 +7,13 @@ from checks.services.check_mysql import MysqlService, MysqlCheck
 from checks.services.check_ping import PingService, PingCheck
 from checks.services.check_ssh import SshService, SshCheck
 from checks.services.check_web import WebService, WebCheck
-from configuration.persistence import Base, engine
-from scoreboard.app import user_manager
+from configuration.models import Models
+from scoreboard.app import db
 from teams.team import Team
-from teams.user import User
 
-Base.metadata.create_all(engine)
+Models.create_tables(db.engine)
 
-Session = sessionmaker(bind=engine)
+Session = sessionmaker(bind=db.engine)
 session = Session()
 
 white = Team(name='White')
@@ -43,7 +42,7 @@ def create_dns_service(server):
 def create_web_service(server, protocol):
     web = WebService(server)
     web.checks.append(WebCheck(protocol, '', 200, WebCheck.STATUS, value=5))
-    web.checks.append(WebCheck(protocol, 'It works', 200, WebCheck.CONTENT_CONTAINS, value=20))
+    web.checks.append(WebCheck(protocol, '', 'It works', WebCheck.CONTENT_CONTAINS, value=20))
     web.checks.append(WebCheck(protocol, 'not-there.html', 404, WebCheck.STATUS, value=5))
     return web
 
@@ -78,13 +77,14 @@ blue.services.append(create_mysql_service('db.team1.ists'))
 blue.services.append(create_ping_service())
 
 for team in [white, blue, red]:
-    a = "asdf"
+    """
+    password = team.name + '123'
     user = User(username=team.name.lower(),
-                password=user_manager.hash_password(team.name + '123'),
+                password=user_manager.hash_password(password),
                 active=True,
                 team=team)
+    """
     session.add(team)
-    session.add(user)
 
 session.commit()
 

@@ -10,6 +10,8 @@ from checks.services.check_dns import DnsService
 from checks.services.check_mysql import MysqlService
 from checks.services.check_ssh import SshService
 from checks.services.check_web import WebService
+from checks.services.check_ftp import FtpService
+from checks.services.check_ping import PingService
 from configuration.persistence import engine
 from teams.team import Team
 
@@ -28,7 +30,7 @@ class Engine:
         self.session.commit()
 
     def load_teams(self):
-        service_poly = with_polymorphic(Service, [DnsService, MysqlService, SshService, WebService], aliased=True)
+        service_poly = with_polymorphic(Service, [DnsService, MysqlService, SshService, WebService, FtpService, PingService], aliased=True)
         self.teams = self.session.query(Team). \
             options(
             joinedload(Team.services.of_type(service_poly))

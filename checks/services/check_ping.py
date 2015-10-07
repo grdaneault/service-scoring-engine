@@ -1,10 +1,13 @@
+import shlex
+import platform
+import subprocess
+
 from sqlalchemy import Column, String
 from sqlalchemy import Integer
 from sqlalchemy.orm import relationship
+
 from checks.service_checks import Service, CheckResult, ServiceCheck, ForeignKey
-import os
-import shlex
-import platform
+
 
 class PingService(Service):
     __mapper_args__ = {'polymorphic_identity': 'icmp'}
@@ -15,11 +18,11 @@ class PingService(Service):
 
     def run_check(self, check, credentials=None):
         count_arg = 'n' if platform.platform() == 'Windows' else 'c'
-        response = os.system('ping -%s 1 %s' % (count_arg, shlex.quote(self.host)))
-        if response == 0:
-            return CheckResult(True, 'Host %s is up' % self.host)
-        else:
-            return CheckResult(False, 'Host %s is down' % self.host)
+        try:
+            subprocess.check_output(['ping', '-%s' % count_arg, '1', shlex.quote(check.host)])
+            return CheckResult(True, 'Host %s is up' % check.host)
+        except subprocess.CalledProcessError as err:
+            return CheckResult(False, 'Host %s is down (response: %d)' % (check.host, err.returncode))
 
     def requires_credentials(self, check):
         return False
@@ -35,3 +38,6 @@ class PingCheck(ServiceCheck):
     def __init__(self, host, value=5):
         ServiceCheck.__init__(self, value=value)
         self.host = host
+
+    def __str__(self):
+        return '<PingCheck of %s>' % self.host
