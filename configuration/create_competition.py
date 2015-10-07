@@ -63,8 +63,8 @@ def create_ftp_service(server):
     ftp.checks.append(FtpCheck(is_anonymous=False, operation=FtpCheck.LIST))
     return ftp
 
-def create_ping_service():
-    ping = PingService()
+def create_ping_service(network):
+    ping = PingService(network)
     for host in range(10, 50, 10):
         ping.checks.append(PingCheck('192.168.159.1%s' % host))
     return ping
@@ -75,7 +75,7 @@ blue.services.append(create_web_service('192.168.159.110', 'http'))
 blue.services.append(create_web_service('www.team1.ists', 'https'))
 blue.services.append(create_ssh_service('ssh.team1.ists'))
 blue.services.append(create_mysql_service('db.team1.ists'))
-blue.services.append(create_ping_service())
+blue.services.append(create_ping_service('192.168.159.0/24'))
 
 for team in [white, blue, red]:
     password = team.name + '123'

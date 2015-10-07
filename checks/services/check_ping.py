@@ -16,8 +16,8 @@ class PingService(Service):
     __mapper_args__ = {'polymorphic_identity': 'icmp'}
     checks = relationship('PingCheck', backref='service')
 
-    def __init__(self):
-        Service.__init__(self, '', None)
+    def __init__(self, network):
+        Service.__init__(self, network, None)
 
     def run_check(self, check, credentials=None):
         count_arg = 'n' if platform.platform() == 'Windows' else 'c'

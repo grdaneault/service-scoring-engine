@@ -7,7 +7,7 @@
 <h1>{{team.name}} Team</h1>
 <ul>
     {%- for service in team.services %}
-        <li><a href="{{ url_for('services.team_service_overview', service_id=service.id) }}">{{service}}</a></li>
+        <li><a href="{{ url_for('services.team_service_overview', service_id=service.id) }}">{{service.friendly_name()}} on {{service.host}}</a></li>
     {% endfor %}
 </ul>
 
