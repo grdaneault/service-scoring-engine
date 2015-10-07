@@ -9,7 +9,7 @@ from checks.services.check_ssh import SshService, SshCheck
 from checks.services.check_web import WebService, WebCheck
 from configuration.models import Models
 from scoreboard.app import db, user_manager
-from teams.user import User
+from teams.user2 import User
 from teams.team import Team
 
 Models.create_tables(db.engine)

@@ -26,6 +26,9 @@ class User(Base, UserMixin):
     team_id = Column(Integer, ForeignKey("team.id"))
     team = relationship("Team")
 
+    def __init__(self, **kwargs):
+        Base.__init__(self, **kwargs)
+
 class Role(Base):
     __tablename__ = 'role'
     id = Column(Integer(), primary_key=True)

@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy, _QueryProperty, BaseQuery
 from configuration.models import Models
 from configuration.persistence import Base
 import configuration.web_configuration
-from teams.user import User
+from teams.user2 import User
 
 app = Flask(__name__)
 app.config.from_object(configuration.web_configuration.ConfigClass)

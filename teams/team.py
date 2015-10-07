@@ -7,6 +7,6 @@ class Team(Base):
 
     __tablename__ = 'team'
     id = Column(Integer, primary_key=True)
-    name = Column(String(255))
+    name = Column(String(255), unique=True)
 
     services = relationship('Service', order_by='Service.id', backref=backref('team'))
