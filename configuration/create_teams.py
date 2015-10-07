@@ -68,6 +68,8 @@ blue.services.append(http)
 blue.services.append(https)
 blue.services.append(mysql)
 
+session.add(white)
 session.add(blue)
+session.add(red)
 session.commit()
 

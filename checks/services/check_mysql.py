@@ -65,8 +65,8 @@ class MysqlCheck(ServiceCheck):
 
     mysql_check_id = Column('id', Integer, ForeignKey('service_check.id'), primary_key=True)
 
-    database = Column(String(255))
-    table = Column(String(255))
+    database = Column(String(255), nullable=False)
+    table = Column(String(255), nullable=False)
 
     def __init__(self, database, table):
         self.database = database

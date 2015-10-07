@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker, joinedload
 from sqlalchemy.orm import with_polymorphic
 
 from checks.check_executor import CheckExecutor
-from checks.service_checks import CheckRound, Service
+from checks.service_checks import CheckRound, Service, TeamCheckRound
 from checks.services.check_dns import DnsService
 from checks.services.check_mysql import MysqlService
 from checks.services.check_ssh import SshService
@@ -43,6 +43,10 @@ class Engine:
         check_threads = []
 
         for team in self.teams:
+            team_round = TeamCheckRound(team=team, check_round=check_round)
+            team_round_threads = []
+            check_threads.append((team_round, team_round_threads))
+
             for service in team.services:
 
                 service_credentials = service.credentials
@@ -59,13 +63,14 @@ class Engine:
 
                     check_thread = CheckExecutor(service, check, credentials)
                     check_thread.start()
-                    check_threads.append(check_thread)
+                    team_round_threads.append(check_thread)
 
-        for thread in check_threads:
-            thread.join()
-            check_round.checks.append(thread.result)
+        for team in check_threads:
+            for thread in team[1]:
+                thread.join()
+                team[0].checks.append(thread.result)
 
-        check_round.end()
+        check_round.finish()
 
         print('All checks in round %d finished' % self.rounds)
         self.session.commit()

@@ -11,9 +11,9 @@ class Service(Base):
     __tablename__ = 'service'
 
     id = Column(Integer, primary_key=True)
-    team_id = Column(Integer, ForeignKey('team.id'))
-    host = Column(String(255))
-    port = Column(Integer)
+    team_id = Column(Integer, ForeignKey('team.id'), nullable=False)
+    host = Column(String(255), nullable=True)
+    port = Column(Integer, nullable=True)
 
     credentials = relationship('CheckCredentials', backref='service')
 
@@ -102,9 +102,9 @@ class ServiceCheck(Base):
     __tablename__ = 'service_check'
 
     id = Column(Integer, primary_key=True)
-    service_id = Column(Integer, ForeignKey('service.id'))
+    service_id = Column(Integer, ForeignKey('service.id'), nullable=False)
 
-    check_type = Column('type', String(50))
+    check_type = Column('type', String(50), nullable=False)
 
     results = relationship('CheckResult', backref='check', lazy='noload')
     __mapper_args__ = {'polymorphic_on': check_type}
@@ -114,11 +114,11 @@ class CheckResult(Base):
     __tablename__ = 'check_result'
 
     id = Column(Integer, primary_key=True)
-    check_id = Column(Integer, ForeignKey('service_check.id'))
-    check_round_id = Column(Integer, ForeignKey('check_round.id'))
+    check_id = Column(Integer, ForeignKey('service_check.id'), nullable=False)
+    team_check_round_id = Column(Integer, ForeignKey('team_check_round.id'), nullable=False)
 
-    success = Column(Boolean)
-    message = Column(Text)
+    success = Column(Boolean, nullable=False, default=False)
+    message = Column(Text, nullable=False, default='')
 
     def __init__(self, success=True, message=''):
         self.success = success
@@ -138,9 +138,9 @@ class CheckCredentials(Base):
 
     id = Column(Integer, primary_key=True)
 
-    user = Column(String(255))
-    password = Column(String(255))
-    service_id = Column(Integer, ForeignKey('service.id'))
+    user = Column(String(255), nullable=False)
+    password = Column(String(255), nullable=False)
+    service_id = Column(Integer, ForeignKey('service.id'), nullable=False)
 
     def __init__(self, user, password):
         self.user = user
@@ -151,10 +151,9 @@ class CheckRound(Base):
     __tablename__ = 'check_round'
 
     id = Column(Integer, primary_key=True)
-    start = Column(DateTime)
-    end = Column(DateTime)
-
-    checks = relationship('CheckResult', backref='checks')
+    start = Column(DateTime, nullable=False)
+    end = Column(DateTime, nullable=True)
+    team_checks = relationship('TeamCheckRound', backref='check_round')
 
     def __init__(self):
         Base.__init__(self)
@@ -162,3 +161,15 @@ class CheckRound(Base):
 
     def finish(self):
         self.end = datetime.datetime.now()
+
+
+class TeamCheckRound(Base):
+    __tablename__ = 'team_check_round'
+
+    id = Column(Integer, primary_key=True)
+    check_round_id = Column(Integer, ForeignKey('check_round.id'), nullable=False)
+
+    team_id = Column(Integer, ForeignKey('team.id'), nullable=False)
+    team = relationship('Team')
+
+    checks = relationship('CheckResult', backref='checks')

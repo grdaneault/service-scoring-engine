@@ -6,3 +6,4 @@ ServiceCheck = service_checks.ServiceCheck
 CheckCredentials = service_checks.CheckCredentials
 CheckResult = service_checks.CheckResult
 CheckRound = service_checks.CheckRound
+TeamCheckRound = service_checks.TeamCheckRound

@@ -1,3 +1,5 @@
+from sqlalchemy import Column, String
+from sqlalchemy import Integer
 from sqlalchemy.orm import relationship
 from checks.service_checks import Service, CheckResult, ServiceCheck
 import os
@@ -6,11 +8,10 @@ import platform
 
 class PingService(Service):
     __mapper_args__ = {'polymorphic_identity': 'icmp'}
-    checks = relationship('ServiceCheck')
+    checks = relationship('ServiceCheck', backref='service')
 
-    def __init__(self, host):
-        Service.__init__(self, host)
-        self.checks.append(PingCheck())
+    def __init__(self):
+        Service.__init__(self, '', None)
 
     def run_check(self, check, credentials=None):
         count_arg = 'n' if platform.platform() == 'Windows' else 'c'
@@ -25,4 +26,8 @@ class PingService(Service):
 
 
 class PingCheck(ServiceCheck):
+    __tablename__ = 'check_detail_ping'
     __mapper_args__ = {'polymorphic_identity': 'icmp'}
+
+    ping_id = Column(Integer, primary_key=True)
+    host = Column(String(255), nullable=False)

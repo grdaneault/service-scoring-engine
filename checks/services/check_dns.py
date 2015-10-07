@@ -49,9 +49,9 @@ class DnsCheck(ServiceCheck):
 
     dns_check_id = Column('id', Integer, ForeignKey('service_check.id'), primary_key=True)
 
-    hostname = Column(String(255))
-    ip = Column(String(45))
-    strict_match = Column(Boolean)
+    hostname = Column(String(255), nullable=False)
+    ip = Column(String(45), nullable=True)
+    strict_match = Column(Boolean, nullable=False, default=False)
 
     def __init__(self, hostname, ip, strict_match=True):
         self.hostname = hostname

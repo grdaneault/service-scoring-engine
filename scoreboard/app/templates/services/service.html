@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}
+Editing {{service_name}} | {{team.name}} Team Services
+{% endblock %}
+
+{% block content %}
+<h1>Editing {{service_name}} | {{team.name}} Team Services</h1>
+<ul>
+    {%- for check in service.checks %}
+    <li><a href="{{ url_for('services.team_service_check_overview', service_id=service.id, check_id=check.id) }}">{{check}}</a></li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

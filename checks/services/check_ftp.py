@@ -80,8 +80,8 @@ class FtpCheck(ServiceCheck):
 
     ftp_check_id = Column('id', Integer, ForeignKey('service_check.id'), primary_key=True)
 
-    is_anonymous = Column(Boolean)
-    operation = Column(String(20))
+    is_anonymous = Column(Boolean, nullable=False, default=False)
+    operation = Column(String(20), nullable=False)
 
     LIST = 'list'
     UPLOAD = 'write'

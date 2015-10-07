@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}
+CDT Stats
+{% endblock %}
+{% block head %}
+<style>
+    li.pass, li.fail {
+        list-style: none;
+    }
+
+    li.pass .glyphicon {
+        color: #04B431;
+    }
+
+    li.fail .glyphicon {
+        color: #B40404;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <h1>Service History:</h1>
+    <ul>
+        {%- for check_round in check_rounds %}
+            <li>Round {{ check_round.id }}:
+            <ul>
+                {%- for team_check_round in check_round.team_checks %}
+                    {% if team_check_round.team.services %}
+                        <li>Team: {{team_check_round.team.name}}
+                        <ul>
+                            {%- for check_result in team_check_round.checks %}
+                                <li class="{% if check_result.success %}pass{% else %}fail{% endif %}">
+                                    <span class="glyphicon glyphicon-{% if check_result.success %}ok{% else %}remove{% endif %}"></span>
+                                    {{ check_result.message }} {{check_result.check.service}}</li>
+                            {%- endfor %}
+                        </ul></li>
+                    {% endif %}
+                {%- endfor %}
+            </ul></li>
+        {%- endfor %}
+
+    </ul>
+</div>
+{% endblock %}

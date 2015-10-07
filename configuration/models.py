@@ -13,6 +13,7 @@ class Models:
     CheckCredentials = checks.CheckCredentials
     CheckResult = checks.CheckResult
     CheckRound = checks.CheckRound
+    TeamCheckRound = checks.TeamCheckRound
 
     # Services
     DnsService = checks.services.DnsService

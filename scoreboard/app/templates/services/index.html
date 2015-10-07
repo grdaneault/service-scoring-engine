@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}
+{{team.name}} Team Services
+{% endblock %}
+
+{% block content %}
+<h1>{{team.name}} Team</h1>
+<ul>
+    {%- for service in team.services %}
+        <li><a href="{{ url_for('services.team_service_overview', service_id=service.id) }}">{{service}}</a></li>
+    {% endfor %}
+</ul>
+
+{% endblock %}
