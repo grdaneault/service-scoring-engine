@@ -1,6 +1,6 @@
-from teams import user2, team
+from teams import user, team
 
 __author__ = 'gregd'
 
-User = user2.User
+User = user.User
 Team = team.Team
