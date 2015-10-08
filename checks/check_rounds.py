@@ -3,8 +3,6 @@ from sqlalchemy import Column, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from configuration.persistence import Base
 
-__author__ = 'gregd'
-
 
 class CheckRound(Base):
     __tablename__ = 'check_round'
@@ -31,4 +29,12 @@ class TeamCheckRound(Base):
     team_id = Column(Integer, ForeignKey('team.id'), nullable=False)
     team = relationship('Team')
 
-    checks = relationship('CheckResult', backref='checks')
+    service_results = relationship('ServiceCheckRound', backref='team_round')
+
+class ServiceCheckRound(Base):
+    __tablename__ = 'service_check_round'
+
+    id = Column(Integer, primary_key=True)
+    service_id = Column(Integer, ForeignKey('service.id'))
+    team_round_id = Column(Integer, ForeignKey('team_check_round.id'))
+    results = relationship('CheckResult', backref='service_check_round')

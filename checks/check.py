@@ -34,7 +34,7 @@ class CheckResult(Base):
 
     id = Column(Integer, primary_key=True)
     check_id = Column(Integer, ForeignKey('service_check.id'), nullable=False)
-    team_check_round_id = Column(Integer, ForeignKey('team_check_round.id'), nullable=False)
+    service_check_round_id = Column(Integer, ForeignKey('service_check_round.id'), nullable=False)
 
     success = Column(Boolean, nullable=False, default=False)
     message = Column(Text, nullable=False, default='')

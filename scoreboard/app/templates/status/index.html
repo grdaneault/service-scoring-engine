@@ -28,12 +28,18 @@ CDT Stats
                     {% if team_check_round.team.services %}
                         <li>Team: {{team_check_round.team.name}}
                         <ul>
-                            {%- for check_result in team_check_round.checks %}
-                                <li class="{% if check_result.success %}pass{% else %}fail{% endif %}">
-                                    <span class="glyphicon glyphicon-{% if check_result.success %}ok{% else %}remove{% endif %}"></span>
-                                    <a href="{{ url_for('services.team_service_overview', service_id=check_result.check.service.id) }}">
-                                        <strong>{{ check_result.check.service.friendly_name() }}</strong>
-                                        on {{check_result.check.service.host}}</a></li>
+                            {%- for service_check_round in team_check_round.service_results %}
+                                <li>
+                                    <a href="{{ url_for('services.team_service_overview', service_id=service_check_round.service.id) }}">
+                                        <strong>{{ service_check_round.service.friendly_name() }}</strong>
+                                        on {{service_check_round.service.host}}</a><ul>
+                                    {%- for check in service_check_round.results %}
+                                        <li class="{% if check.success %}pass{% else %}fail{% endif %}">
+                                            <span class="glyphicon glyphicon-{% if check.success %}ok{% else %}remove{% endif %}"></span>
+                                            {{ check.message }}
+                                        </li>
+                                    {% endfor %}
+                                </ul></li>
                             {%- endfor %}
                         </ul></li>
                     {% endif %}

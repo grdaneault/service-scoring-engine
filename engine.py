@@ -3,7 +3,7 @@ import time
 from sqlalchemy.orm import sessionmaker, joinedload
 
 from sqlalchemy.orm import with_polymorphic
-from checks import CheckRound, TeamCheckRound
+from checks import CheckRound, TeamCheckRound, ServiceCheckRound
 
 from checks.check_executor import CheckExecutor
 from checks.services import Service
@@ -47,10 +47,12 @@ class Engine:
 
         for team in self.teams:
             team_round = TeamCheckRound(team=team, check_round=check_round)
-            team_round_threads = []
-            check_threads.append((team_round, team_round_threads))
 
             for service in team.services:
+                service_round_threads = []
+                service_round = ServiceCheckRound(team_round=team_round, service=service)
+                check_threads.append((service_round, service_round_threads))
+
                 for check in service.checks:
                     credentials = [None]
                     if service.requires_credentials(check) and check.credentials:
@@ -59,12 +61,12 @@ class Engine:
                     for credential in credentials:
                         check_thread = CheckExecutor(service, check, credential)
                         check_thread.start()
-                        team_round_threads.append(check_thread)
+                        service_round_threads.append(check_thread)
 
-        for team in check_threads:
-            for thread in team[1]:
+        for service_round in check_threads:
+            for thread in service_round[1]:
                 thread.join()
-                team[0].checks.append(thread.result)
+                service_round[0].results.append(thread.result)
 
         check_round.finish()
 

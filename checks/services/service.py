@@ -2,6 +2,7 @@ import abc
 
 from sqlalchemy import Column, Integer, String
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 
 from checks.check import CheckResult
 from configuration.persistence import Base
@@ -17,6 +18,8 @@ class Service(Base):
 
     discriminator = Column('type', String(20))
     __mapper_args__ = {'polymorphic_on': discriminator}
+
+    check_results = relationship('ServiceCheckRound', backref='service')
 
     TIMEOUT = 10
 
