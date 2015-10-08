@@ -38,3 +38,18 @@ class ServiceCheckRound(Base):
     service_id = Column(Integer, ForeignKey('service.id'))
     team_round_id = Column(Integer, ForeignKey('team_check_round.id'))
     results = relationship('CheckResult', backref='service_check_round')
+
+
+    def get_maximum_service_score(self):
+        score = 0
+        for result in self.results:
+            score += result.check.value
+
+        return score
+
+    def get_service_score(self):
+        score = 0
+        for result in self.results:
+            score += result.check.value if result.success else 0
+
+        return score
