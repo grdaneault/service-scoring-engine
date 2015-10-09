@@ -1,6 +1,6 @@
 import abc
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -15,6 +15,8 @@ class Service(Base):
     team_id = Column(Integer, ForeignKey('team.id'), nullable=False)
     host = Column(String(255), nullable=True)
     port = Column(Integer, nullable=True)
+
+    is_enabled = Column(Boolean, nullable=False, default=True)
 
     discriminator = Column('type', String(20))
     __mapper_args__ = {'polymorphic_on': discriminator}

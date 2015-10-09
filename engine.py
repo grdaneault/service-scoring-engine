@@ -50,6 +50,9 @@ class Engine:
             team_round = TeamCheckRound(team=team, check_round=check_round)
 
             for service in team.services:
+                if not service.is_enabled:
+                    continue
+
                 service_round_threads = []
                 service_round = ServiceCheckRound(team_round=team_round, service=service)
                 check_threads.append((service_round, service_round_threads))
