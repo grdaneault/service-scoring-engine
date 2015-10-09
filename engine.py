@@ -1,3 +1,4 @@
+import random
 import time
 
 from sqlalchemy.orm import sessionmaker, joinedload
@@ -79,7 +80,7 @@ class Engine:
         while True:
             self.load_teams()
             self.check_round()
-            time.sleep(30)
+            time.sleep(random.randint(30, 90))
 
 scoring_engine = Engine(engine)
 scoring_engine.start()

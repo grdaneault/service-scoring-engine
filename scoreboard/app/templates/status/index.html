@@ -4,49 +4,66 @@ CDT Stats
 {% endblock %}
 {% block head %}
 <style>
-    li.pass, li.fail {
-        list-style: none;
+    .service-listing li {
+        list-style: none none;
     }
 
-    li.pass .glyphicon {
+    li.service-name {
+        font-size: 16px;
+    }
+
+    .pass, .warn, .fail{
+        margin-right: 10px;
+    }
+
+    .pass {
         color: #04B431;
     }
 
-    li.fail .glyphicon {
+    .fail {
         color: #B40404;
+    }
+
+    .warn {
+        color: #FFA500;
     }
 </style>
 {% endblock %}
 {% block content %}
 <div class="row">
-    <h1>Service History:</h1>
-    <ul>
-        {%- for check_round in check_rounds %}
-            <li>Round {{ check_round.id }}:
-            <ul>
-                {%- for team_check_round in check_round.team_checks %}
-                    {% if team_check_round.team.services %}
-                        <li>Team: {{team_check_round.team.name}}
-                        <ul>
-                            {%- for service_result in team_check_round.service_results %}
-                                <li>
+    <h1>Service Status:</h1>
+    <ul class="service-listing">
+        {%- for team_round in check_round.team_checks %}
+            {% if team_round.team.services %}
+                <li><h2>Team: {{team_round.team.name}}</h2>
+                <ul>
+                    {%- for service_result in team_round.service_results %}
+                        <li class="service-name">
+                            <h3>
+                                <span class="{{ service_result.status }} fa fa-{{ service_result.check_icon }}"></span>
+                                {% if not current_user.is_authenticated or current_user.team != team_round.team %}
+                                    <strong>{{ service_result.service.friendly_name() }}:</strong>
+                                    {{ service_result.get_service_score() }} / {{service_result.get_maximum_service_score() }}
+                                {% else %}
                                     <a href="{{ url_for('services.team_service_overview', service_id=service_result.service.id) }}">
                                         <strong>{{ service_result.service.friendly_name() }}</strong>
-                                        on {{service_result.service.host}}</a>: {{ service_result.get_service_score() }} / {{service_result.get_maximum_service_score() }} <ul>
-                                    {%- for check in service_result.results %}
-                                        <li class="{% if check.success %}pass{% else %}fail{% endif %}">
-                                            <span class="glyphicon glyphicon-{% if check.success %}ok{% else %}remove{% endif %}"></span>
+                                        on {{service_result.service.host}}:</a>
+                                    {{ service_result.get_service_score() }} / {{service_result.get_maximum_service_score() }}
+                            </h3>
+                                <ul>
+                                    {% for check in service_result.results %}
+                                        <li>
+                                            <span class="fa fa-{% if check.success %}check{% else %}times{% endif %} {% if check.success %}pass{% else %}fail{% endif %}"></span>
                                             {{ check.message }}
                                         </li>
                                     {% endfor %}
-                                </ul></li>
-                            {%- endfor %}
-                        </ul></li>
-                    {% endif %}
-                {%- endfor %}
-            </ul></li>
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {%- endfor %}
+                </ul></li>
+            {% endif %}
         {%- endfor %}
-
     </ul>
 </div>
 {% endblock %}
