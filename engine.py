@@ -80,7 +80,9 @@ class Engine:
         while True:
             self.load_teams()
             self.check_round()
-            time.sleep(random.randint(30, 90))
+            sleep = random.randint(30, 90)
+            print('Next check round in %s seconds.' % sleep)
+            time.sleep(sleep)
 
 scoring_engine = Engine(engine)
 scoring_engine.start()
