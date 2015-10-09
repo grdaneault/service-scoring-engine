@@ -78,8 +78,17 @@ class WebCheck(ServiceCheck):
     STATUS = 'status'
     CONTENT_CONTAINS = 'contentContains'
     CONTENT_MATCHES = 'contentMatches'
+    CONTENT_HASH = 'contentHash'
 
-    def __init__(self, protocol, path, content, check_mode, value=10):
+    DEFAULT_VALUES = {
+        STATUS: 2,
+        CONTENT_CONTAINS: 5,
+        CONTENT_MATCHES: 5,
+        CONTENT_HASH: 10
+    }
+
+    def __init__(self, protocol, path, content, check_mode, value=None):
+        value = WebCheck.DEFAULT_VALUES[check_mode] if value is None else value
         ServiceCheck.__init__(self, value=value)
         self.protocol = protocol
         self.path = path

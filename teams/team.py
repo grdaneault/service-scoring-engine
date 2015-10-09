@@ -10,3 +10,4 @@ class Team(Base):
     name = Column(String(255), unique=True)
 
     services = relationship('Service', order_by='Service.id', backref=backref('team'))
+    credentials = relationship('CheckCredentials')

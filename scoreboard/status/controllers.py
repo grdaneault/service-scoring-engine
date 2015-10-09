@@ -2,13 +2,14 @@
 from flask import Blueprint, render_template
 
 # Import the database object from the main app module
+from sqlalchemy import null
 from checks import CheckRound
 
 mod_status = Blueprint('status', __name__)
 
 @mod_status.route('/', methods=['GET'])
 def main_status_page():
-    check_round = CheckRound.query.order_by(CheckRound.id.desc()).limit(1).all()[0]
+    check_round = CheckRound.query.order_by(CheckRound.id.desc()).filter(CheckRound.end.isnot(null())).limit(1).first()
     for team_round in check_round.team_checks:
         for service_round in team_round.service_results:
             if service_round.get_service_score() == 0:

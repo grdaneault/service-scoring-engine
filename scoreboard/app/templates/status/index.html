@@ -3,6 +3,7 @@
 CDT Stats
 {% endblock %}
 {% block head %}
+    <meta http-equiv="refresh" content="5">
 <style>
     .service-listing li {
         list-style: none none;
@@ -31,7 +32,7 @@ CDT Stats
 {% endblock %}
 {% block content %}
 <div class="row">
-    <h1>Service Status:</h1>
+    <h1>Service Status as of  {{ check_round.end.strftime('%H:%M') }}</h1>
     <ul class="service-listing">
         {%- for team_round in check_round.team_checks %}
             {% if team_round.team.services %}

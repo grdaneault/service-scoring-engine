@@ -44,7 +44,7 @@ def create_dns_service(server):
 def create_web_service(server, protocol):
     web = WebService(server)
     web.checks.append(WebCheck(protocol, '', 200, WebCheck.STATUS, value=5))
-    web.checks.append(WebCheck(protocol, '', 'It works', WebCheck.CONTENT_CONTAINS, value=20))
+    web.checks.append(WebCheck(protocol, '', 'It works', WebCheck.CONTENT_CONTAINS, value=10))
     web.checks.append(WebCheck(protocol, 'not-there.html', 404, WebCheck.STATUS, value=5))
     return web
 
@@ -80,6 +80,8 @@ blue.services.append(create_web_service('www.team1.ists', 'https'))
 blue.services.append(create_ssh_service('ssh.team1.ists', blue_credentials))
 blue.services.append(create_mysql_service('db.team1.ists', blue_credentials[1:1]))
 blue.services.append(create_ping_service('192.168.159.0/24'))
+
+blue.credentials.extend(blue_credentials)
 
 for team in [white, blue, red]:
     password = team.name + '123'
