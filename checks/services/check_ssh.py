@@ -65,3 +65,6 @@ class SshCheck(ServiceCheck):
 
     def __str__(self):
         return '<SshCheck of \'%s\' %s>' % (self.service.host, self.command)
+
+    def friendly_name(self):
+        return 'Check that an authenticated user can run the %s command.' % self.command

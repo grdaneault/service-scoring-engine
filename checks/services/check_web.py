@@ -97,3 +97,14 @@ class WebCheck(ServiceCheck):
 
     def __str__(self):
         return '<WebCheck of \'%s\' for %s>' % (self.service.get_url(self), self.content)
+
+    def friendly_name(self):
+
+        if self.check_mode == WebCheck.STATUS:
+            check = 'returns a %s status code for %s' % (self.content, self.service.get_url(self))
+        elif self.check_mode in [WebCheck.CONTENT_CONTAINS, WebCheck.CONTENT_MATCHES]:
+            check = 'returns a page containing the expected content for %s' % self.service.get_url(self)
+        elif self.check_mode == WebCheck.CONTENT_HASH:
+            check = 'returns a page with the exact specified content'
+
+        return 'Check that the web server %s.' % check

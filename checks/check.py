@@ -29,6 +29,9 @@ class ServiceCheck(Base):
         for credential in credentials:
             self.credentials.append(credential)
 
+    def friendly_name(self):
+        return str(self)
+
 
 class CheckResult(Base):
     __tablename__ = 'check_result'

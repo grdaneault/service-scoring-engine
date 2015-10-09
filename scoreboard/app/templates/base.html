@@ -13,13 +13,6 @@
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.10.2.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
 
-    <!-- you need to include the shieldui css and js assets in order for the charts to work -->
-    <link rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/shieldui-all.min.css" />
-    <link rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/light-bootstrap/all.min.css" />
-    <link id="gridcss" rel="stylesheet" type="text/css" href="http://www.shieldui.com/shared/components/latest/css/dark-bootstrap/all.min.css" />
-
-    <script type="text/javascript" src="http://www.shieldui.com/shared/components/latest/js/shieldui-all.min.js"></script>
-    <script type="text/javascript" src="http://www.prepbootstrap.com/Content/js/gridData.js"></script>
     {% block head %}
     {% endblock %}
 </head>
@@ -60,6 +53,18 @@
         </nav>
 
         <div id="page-wrapper">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert alert-danger" role="alert">
+                        <ul class=flashes>
+                            {% for message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                {% endif %}
+            {% endwith %}
             {% block content %}{% endblock %}
             {% block post_content %}{% endblock %}
         </div>

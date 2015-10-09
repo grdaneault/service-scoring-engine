@@ -44,3 +44,6 @@ class PingCheck(ServiceCheck):
 
     def __str__(self):
         return '<PingCheck of %s>' % self.host
+
+    def friendly_name(self):
+        return 'Check that %s responds to pings.' % self.host

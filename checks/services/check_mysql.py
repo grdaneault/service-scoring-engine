@@ -78,3 +78,6 @@ class MysqlCheck(ServiceCheck):
 
     def __str__(self):
         return '<MysqlCheck of %s/%s.%s>' % (self.service.host, self.database, self.table)
+
+    def friendly_name(self):
+        return 'Check for database %s and table %s with content in it.' % (self.database, self.table)

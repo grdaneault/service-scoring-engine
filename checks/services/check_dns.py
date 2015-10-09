@@ -72,3 +72,8 @@ class DnsCheck(ServiceCheck):
         strict_str = self.ip if self.strict_match else "non-strict"
         return '<DnsCheck of %s \'%s\' (%s)>' % (self.service.host, strict_str, self.hostname)
 
+    def friendly_name(self):
+        requirement = 'to %s' % self.ip if self.strict_match else 'correctly'
+        return 'Checking that %s resolves %s.' % (self.hostname, requirement)
+
+

@@ -92,3 +92,12 @@ class FtpCheck(ServiceCheck):
     def __str__(self):
         user_str = 'anonymous' if self.is_anonymous else 'authenticated'
         return '<FtpCheck of \'%s\' %s as an %s user>' % (self.service.host, self.operation, user_str)
+
+    def friendly_name(self):
+        if self.operation == FtpCheck.LIST:
+            operation = 'listing files from the server'
+        else:
+            operation = 'uploading and downloading files from the server'
+
+        user_str = 'anonymous' if self.is_anonymous else 'authenticated'
+        return 'Check %s as an %s user.' % (operation, user_str)
