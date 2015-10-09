@@ -55,14 +55,15 @@ class Engine:
                 check_threads.append((service_round, service_round_threads))
 
                 for check in service.checks:
-                    credentials = [None]
-                    if service.requires_credentials(check) and check.credentials:
-                        credentials = check.credentials
+                    if check.is_enabled:
+                        credentials = [None]
+                        if service.requires_credentials(check) and check.credentials:
+                            credentials = check.credentials
 
-                    for credential in credentials:
-                        check_thread = CheckExecutor(service, check, credential)
-                        check_thread.start()
-                        service_round_threads.append(check_thread)
+                        for credential in credentials:
+                            check_thread = CheckExecutor(service, check, credential)
+                            check_thread.start()
+                            service_round_threads.append(check_thread)
 
         for service_round in check_threads:
             for thread in service_round[1]:

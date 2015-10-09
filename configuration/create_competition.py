@@ -78,7 +78,7 @@ blue.services.append(create_ftp_service('ftp.team1.ists', blue_credentials[1:2])
 blue.services.append(create_web_service('192.168.159.110', 'http'))
 blue.services.append(create_web_service('www.team1.ists', 'https'))
 blue.services.append(create_ssh_service('ssh.team1.ists', blue_credentials))
-blue.services.append(create_mysql_service('db.team1.ists', blue_credentials[1:1]))
+blue.services.append(create_mysql_service('db.team1.ists', blue_credentials[0:1]))
 blue.services.append(create_ping_service('192.168.159.0/24'))
 
 blue.credentials.extend(blue_credentials)

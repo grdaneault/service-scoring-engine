@@ -1,22 +1,15 @@
 {% extends "base.html" %}
 
 {% block title %}
-Editing {{service_name}} | {{team.name}} Team Services
+{{ service.friendly_name() }} | {{team.name}} Team Services
 {% endblock %}
 
 {% block content %}
 <h1>Editing {{ service.friendly_name() }} on {{ service.host }}</h1>
 <h2>Service Checks</h2>
 <ul>
-    {%- for check in service.checks %}
-    <li><a href="{{ url_for('services.team_service_check_overview', service_id=service.id, check_id=check.id) }}">{{ check.friendly_name() }}</a></li>
+    {% for check in service.checks %}
+        <li>{{ check.friendly_name() }}</li>
     {% endfor %}
 </ul>
-
-{% if service.credentials %}
-<h2>Credentials</h2>
-{%- for credential in service.credentials %}
-<li><a href="{{ url_for('services.team_service_credentials_overview', service_id=service.id, credential_id=credential.id) }}">{{ credential.username }}</a></li>
-{% endfor %}
-{% endif %}
 {% endblock %}

@@ -16,6 +16,8 @@ class ServiceCheck(Base):
     check_type = Column('type', String(50), nullable=False)
     value = Column(Integer, nullable=False, default=5)
 
+    is_enabled = Column(Boolean, nullable=False, default=True)
+
     results = relationship('CheckResult', backref='check', lazy='noload')
     __mapper_args__ = {'polymorphic_on': check_type}
 
