@@ -1,20 +1,27 @@
 # Import flask dependencies
-from flask import abort, Blueprint, redirect, url_for, render_template, flash
+from flask import Blueprint, render_template
 
 # Import the database object from the main app module
 from flask.ext.login import current_user, login_required
-from sqlalchemy.sql import functions, join, and_
-from checks import ServiceCheck, CheckCredentials, CheckResult
+from sqlalchemy.sql import functions, join, and_, or_
+from checks import ServiceCheck, CheckResult
 from checks.services import Service
 from scoreboard.app import db
-from scoring import FlagDiscovery, Flag, InjectSolve
+from scoring import FlagDiscovery, Flag, InjectSolve, Inject
+from scoring.inject import team_inject_relation
 from teams import Team
 
 mod_scoring = Blueprint('scoring', __name__, url_prefix='/scoring')
 
 
 def render_scoring_page(*args, **kwargs):
-    kwargs['active_menu'] = 'credentials'
+    kwargs['active_menu'] = 'scoring'
+    kwargs['team'] = current_user.team
+    return render_template(*args, **kwargs)
+
+def render_inject_page(*args, **kwargs):
+    kwargs['active_menu'] = 'injects'
+    kwargs['team'] = current_user.team
     return render_template(*args, **kwargs)
 
 
@@ -40,7 +47,6 @@ def team_score_list():
             earned = services[0]
             maximum = services[1]
 
-        # select sum(c*v) from (SELECT count(*) as c, value as v FROM `flag_discovery` join flag on flag.id = flag_discovery.flag_id where flag.team_id = 2 group by flag.id) as ttt;
         flag_subquery = db.session.\
             query(functions.count(FlagDiscovery.id).label('solve_count'), Flag.value).\
             select_from(join(Flag, FlagDiscovery, Flag.id == FlagDiscovery.flag_id)).\
@@ -70,3 +76,26 @@ def team_score_list():
         scoring_teams.append(team)
 
     return render_scoring_page('scoring/index.html', teams=scoring_teams)
+
+
+@mod_scoring.route('/injects', methods=['GET'])
+@login_required
+def list_injects():
+    team = current_user.team
+
+    query = Inject.query
+    if team.role == Team.WHITE:
+        injects = query.all()
+    else:
+        injects = []
+        for inject in team.available_injects:
+            if inject.enabled:
+                if inject.max_solves == -1 or team.inject_solves(inject) < inject.max_solves:
+                    inject.can_solve = True
+                else:
+                    inject.can_solve = False
+
+                injects.append(inject)
+
+
+    return render_inject_page('scoring/injects.html', injects=injects)

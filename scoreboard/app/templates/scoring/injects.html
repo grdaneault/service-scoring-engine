@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{%  block head %}
+    <style>
+        li {
+            list-style: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h1>Available injects for {{ team.name }}</h1>
+    <ul>
+        {% for inject in injects %}
+            <li>
+                <h2>
+                    {{ inject.title }}
+                </h2>
+                <p>{{ inject.body|nl2br }}</p>
+            </li>
+        {%  endfor %}
+    </ul>
+
+{% endblock %}
