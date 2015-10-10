@@ -16,7 +16,7 @@ Session = sessionmaker(bind=db.engine)
 session = Session()
 
 white = Team(name='White', role=Team.WHITE)
-blue = Team(name='Blue', role=Team.BLUE)
+blue = Team(name='Blue', role=Team.BLUE, ip_space='10.4.26.0/24')
 red = Team(name='Red', role=Team.RED)
 
 """
@@ -91,7 +91,6 @@ for team in [white, blue, red]:
                 password=user_manager.hash_password('default123'),
                 active=True,
                 team=team)
-    session.add(team)
     session.add(user)
 
     print('\tCreating Users')
@@ -106,9 +105,9 @@ for team in [white, blue, red]:
 
     if team.role == Team.BLUE:
         print('\n\tCreating Services')
+        pings = PingService(team.ip_space)
+        team.services.append(pings)
         for machine in machines:
-            pings = PingService(team.ip_space)
-            team.services.append(pings)
             for service in machine.get_services(team):
                 if isinstance(service, PingCheck):
                     pings.checks.append(service)
@@ -127,6 +126,8 @@ for team in [white, blue, red]:
         for inject in machine.get_injects(team):
             team.available_injects.append(inject)
             print('\t\tCreated inject %s (%s)' % (inject.title, inject.value))
+
+    session.add(team)
 
 
 
