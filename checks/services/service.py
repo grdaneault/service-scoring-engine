@@ -97,8 +97,8 @@ class Service(Base):
         if not credentials:
             return self.missing_credentials()
 
-        return CheckResult(False, 'Credential Error.  %s:%s is not authorized for system %s' %
-                           (credentials.user, credentials.password, self.host))
+        return CheckResult(False, 'Credential Error.  Invalid credentials for user %s on system %s' %
+                           (credentials.user, self.host))
 
     def missing_credentials(self):
         """

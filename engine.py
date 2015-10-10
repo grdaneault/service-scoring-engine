@@ -1,5 +1,6 @@
 import random
 import time
+import datetime
 
 from sqlalchemy.orm import sessionmaker, joinedload
 
@@ -75,17 +76,17 @@ class Engine:
 
         check_round.finish()
 
-        print('All checks in round %d finished' % self.rounds)
         self.session.commit()
+        print('All checks in round %d finished' % self.rounds)
         self.rounds += 1
-        print('Session committed')
 
     def start(self):
         while True:
             self.load_teams()
             self.check_round()
             sleep = random.randint(30, 90)
-            print('Next check round in %s seconds.' % sleep)
+            next_time = datetime.datetime.now() + datetime.timedelta(seconds=sleep)
+            print('Next check round in %s seconds. (%s)' % (sleep, next_time.strftime("%H:%M:%S")))
             time.sleep(sleep)
 
 scoring_engine = Engine(engine)
