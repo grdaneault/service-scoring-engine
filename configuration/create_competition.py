@@ -113,6 +113,9 @@ for team in [white, blue, red]:
                     pings.checks.append(service)
                 else:
                     team.services.append(service)
+                    for check in service.checks:
+                        for credential in check.credentials:
+                            team.credentials.append(credential)
                     print('\t\tCreated service %s on %s' % (service.friendly_name(), service.host))
 
     print('\n\tCreating Flags')

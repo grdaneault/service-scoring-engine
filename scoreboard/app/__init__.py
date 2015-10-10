@@ -26,10 +26,12 @@ def register_modules():
     from scoreboard.status.controllers import mod_status as status_module
     from scoreboard.services.controllers import mod_services as services_module
     from scoreboard.credentials.controllers import mod_credentials as credentials_module
+    from scoreboard.score.controllers import mod_scoring as scoring_module
 
     app.register_blueprint(status_module)
     app.register_blueprint(services_module)
     app.register_blueprint(credentials_module)
+    app.register_blueprint(scoring_module)
 
 # Start development web server
 if __name__ == '__main__':
