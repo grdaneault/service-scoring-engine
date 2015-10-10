@@ -1,12 +1,10 @@
-from sqlalchemy.orm import sessionmaker
-from checks import CheckCredentials
+import random
+import string
 
-from checks.services.check_dns import DnsService, DnsCheck
-from checks.services.check_ftp import FtpService, FtpCheck
-from checks.services.check_mysql import MysqlService, MysqlCheck
+from sqlalchemy.orm import sessionmaker
+
 from checks.services.check_ping import PingService, PingCheck
-from checks.services.check_ssh import SshService, SshCheck
-from checks.services.check_web import WebService, WebCheck
+from configuration.cdt import machines
 from configuration.models import create_tables
 from scoreboard.app import db, user_manager
 from teams.user import User
@@ -17,10 +15,11 @@ create_tables(db.engine)
 Session = sessionmaker(bind=db.engine)
 session = Session()
 
-white = Team(name='White')
-blue = Team(name='Blue')
-red = Team(name='Red')
+white = Team(name='White', role=Team.WHITE)
+blue = Team(name='Blue', role=Team.BLUE)
+red = Team(name='Red', role=Team.RED)
 
+"""
 def create_mysql_service(server, credentials):
     mysql = MysqlService(server)
     mysql.checks.append(MysqlCheck(database='secret',
@@ -73,6 +72,8 @@ blue_credentials = [
     CheckCredentials('bob', 'bob')
 ]
 
+
+
 blue.services.append(create_dns_service('192.168.159.100'))
 blue.services.append(create_ftp_service('ftp.team1.ists', blue_credentials[1:2]))
 blue.services.append(create_web_service('192.168.159.110', 'http'))
@@ -82,14 +83,52 @@ blue.services.append(create_mysql_service('db.team1.ists', blue_credentials[0:1]
 blue.services.append(create_ping_service('192.168.159.0/24'))
 
 blue.credentials.extend(blue_credentials)
+"""
 
 for team in [white, blue, red]:
-    password = team.name + '123'
-    user = User(username=team.name.lower(),
-                password=user_manager.hash_password(password),
+    print('Initializing Team %s' % team.name)
+    user = User(username='default_' + team.name.lower(),
+                password=user_manager.hash_password('default123'),
                 active=True,
                 team=team)
     session.add(team)
     session.add(user)
-session.commit()
 
+    print('\tCreating Users')
+    for i in range(1, 4):
+        username = team.name.lower() + str(i)
+        random_pass = ''.join(random.SystemRandom().choice(string.digits + string.ascii_letters) for _ in range(10))
+        user = User(username=username,
+                    password=user_manager.hash_password(random_pass))
+
+        session.add(user)
+        print('\t\tCreated user %s:%s' % (username, random_pass))
+
+    if team.role == Team.BLUE:
+        print('\n\tCreating Services')
+        for machine in machines:
+            pings = PingService(team.ip_space)
+            team.services.append(pings)
+            for service in machine.get_services(team):
+                if isinstance(service, PingCheck):
+                    pings.checks.append(service)
+                else:
+                    team.services.append(service)
+                    print('\t\tCreated service %s on %s' % (service.friendly_name(), service.host))
+
+    print('\n\tCreating Flags')
+    for machine in machines:
+        for flag in machine.get_flags(team):
+            team.own_flags.append(flag)
+            print('\t\tCreated flag %s' % flag.flag)
+
+    print('\n\tCreating Injects')
+    for machine in machines:
+        for inject in machine.get_injects(team):
+            team.available_injects.append(inject)
+            print('\t\tCreated inject %s (%s)' % (inject.title, inject.value))
+
+
+
+
+session.commit()

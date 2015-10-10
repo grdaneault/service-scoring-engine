@@ -11,6 +11,7 @@ class Flag(Base):
     description = Column(Text, nullable=True)
 
 
+
 class FlagDiscovery(Base):
     __tablename__ = 'flag_discovery'
     id = Column(Integer, primary_key=True)

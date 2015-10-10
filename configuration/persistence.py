@@ -1,4 +1,3 @@
-from flask.ext.sqlalchemy import _QueryProperty
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
