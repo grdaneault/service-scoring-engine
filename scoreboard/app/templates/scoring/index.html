@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{%  block title %}
+Scoring Information
+{% endblock %}
+{%  block head %}
+    <style>
+        li {
+            list-style: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h1>Scores</h1>
+    <ul>
+        {% for team in teams %}
+            <li class="credential">
+                <h2>
+                    <span class="fa fa-users fa-padded-left"></span>
+                    {{ team.name }}
+                </h2>
+                <ul>
+                    {% if team.services %}
+                    <li>
+                        <h3>
+                            Service Checks:
+                            <strong>{{ team.scores['services_earned'] }} / {{ team.scores['services_maximum'] }}</strong>
+                    </li>
+                    {% endif %}
+                    {% if team.available_injects %}
+                    <li>
+                        <h3>
+                            Injects:
+                            <strong>{{ team.scores['injects_earned'] }}</strong>
+                        </h3>
+                    </li>
+                    {% endif %}
+                    {% if team.own_flags %}
+                    <li>
+                        <h3>
+                            Flags Lost:
+                            <strong>{{ team.scores['flags_lost'] }}</strong>
+                        </h3>
+                    </li>
+                    {% endif %}
+                </ul>
+            </li>
+        {%  endfor %}
+    </ul>
+
+{% endblock %}

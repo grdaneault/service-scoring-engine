@@ -9,6 +9,7 @@ class Flag(Base):
     flag = Column(String(255), nullable=False)
     team_id = Column(Integer, ForeignKey('team.id'))
     description = Column(Text, nullable=True)
+    value = Column(Integer, nullable=False, default=200)
 
 
 
