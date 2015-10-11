@@ -42,7 +42,7 @@ def can_submit_inject(team, inject):
     :param inject:  The inject to check
     :return:  True, if a new solution for the inject can be submitted
     """
-    if not inject.is_open():
+    if not inject.can_submit():
         return False
     elif inject.max_solves == Inject.UNLIMITED_SOLVES:
         return True

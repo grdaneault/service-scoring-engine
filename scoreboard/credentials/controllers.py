@@ -51,4 +51,4 @@ def team_credential_edit(credential_id):
 def flash_errors(form):
     for field, errors in form.errors.items():
         for error in errors:
-            flash(u"Error: %s" % error )
+            flash(u"Error: %s" % error, category='danger')

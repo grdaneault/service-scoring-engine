@@ -27,10 +27,9 @@
                 </h2>
                 <p>{{ inject.body|nl2br }}</p>
                 <p>
-                    {% if not inject.is_open() %}
+                    {% if not inject.can_submit() %}
                         <a href="{{ url_for('scoring.open_inject', inject_id=inject.id) }}" class="btn btn-success">Enable Inject</a>
-                    {% endif %}
-                    {% if inject.is_open() and inject.is_visible() %}
+                    {% else %}
                         <a href="{{ url_for('scoring.close_inject', inject_id=inject.id) }}" class="btn btn-danger">Close Inject</a>
                     {% endif %}
                 </p>
@@ -39,14 +38,16 @@
                         <li>
                             <strong>{{ solve.team.name }}</strong> submitted at {{ solve.date_requested }}.
                             {% if not solve.is_reviewed() %}
-                                <a href="url_for('scoring.manage_solve', solve_id=solve.id, approve=True) }}" class="btn btn-success">Approve</a>
-                                <a href="url_for('scoring.manage_solve', solve_id=solve.id, approve=False) }}" class="btn btn-danger">Reject</a>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('scoring.manage_solve', solve_id=solve.id, approve=True) }}" class="btn btn-sm btn-success">Approve</a>
+                                    <a href="{{ url_for('scoring.manage_solve', solve_id=solve.id, approve=False) }}" class="btn btn-sm btn-danger">Reject</a>
+                                </div>
                             {% elif solve.approved %}
                                 Approved at {{ solve.date_date_approved }}
-                                <a href="url_for('scoring.manage_solve', solve_id=solve.id, approve=False) }}" class="btn btn-success">Revoke Approval</a>
+                                <a href="{{ url_for('scoring.manage_solve', solve_id=solve.id, approve=False) }}" class="btn btn-sm btn-success">Revoke Approval</a>
                             {% else %}
                                 Rejected at {{ solve.date_date_approved }}
-                                <a href="url_for('scoring.manage_solve', solve_id=solve.id, approve=True) }}" class="btn btn-success">Revoke Approval</a>
+                                <a href="{{ url_for('scoring.manage_solve', solve_id=solve.id, approve=True) }}" class="btn btn-sm btn-success">Revoke Approval</a>
                             {% endif %}
                         </li>
                     {% endfor %}

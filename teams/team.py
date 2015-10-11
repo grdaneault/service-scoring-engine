@@ -23,7 +23,7 @@ class Team(Base):
     solved_flags = relationship('FlagDiscovery')
 
     available_injects = relationship('Inject', secondary=team_inject_relation, backref='teams')
-    solved_injects = relationship('InjectSolve')
+    solved_injects = relationship('InjectSolve', backref='team')
 
 
 

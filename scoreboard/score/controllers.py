@@ -1,6 +1,6 @@
 # Import flask dependencies
 import datetime
-from flask import abort, Blueprint, render_template
+from flask import abort, Blueprint, flash, render_template, redirect, url_for
 
 # Import the database object from the main app module
 from flask.ext.login import current_user, login_required
@@ -102,11 +102,11 @@ def solve_inject(inject_id):
         abort(404)
         return "no."
 
-    if not inject.enabled:
+    if not inject.can_submit():
         abort(401)
         return "no."
 
-    if not team.can_submit_inject(inject):
+    if not can_submit_inject(team, inject):
         abort(401)
         return "can't resolve."
 
@@ -123,7 +123,23 @@ def manage_solve(solve_id, approve):
 @mod_scoring.route('/injects/manage/inject/<inject_id>/open', methods=['GET'])
 @login_required
 def open_inject(inject_id):
-    return 'todo'
+    if not current_user.team.role == Team.WHITE:
+        abort(401)
+        return "no."
+
+    inject = Inject.query.get(inject_id)
+    if not inject:
+        abort(404)
+        return 'inject not found'
+
+    if inject.is_visible():
+        flash('Inject %s (%s) is already open.' % (inject.title, inject.id), category='danger')
+    else:
+        inject.open()
+        db.session.commit()
+        flash('Inject %s (%s) Opened!.' % (inject.title, inject.id), category='success')
+
+    return redirect(url_for('scoring.list_available_injects'))
 
 @mod_scoring.route('/injects/manage/inject/<inject_id>/close', methods=['GET'])
 @login_required

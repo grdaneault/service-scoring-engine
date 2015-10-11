@@ -1,3 +1,4 @@
+import datetime
 from sqlalchemy import Column, Integer, Boolean, String, DateTime, Text, ForeignKey, Table
 from sqlalchemy.orm import relationship
 
@@ -14,17 +15,24 @@ class Inject(Base):
     title = Column(String(255), nullable=False)
     body = Column(Text, nullable=False)
     value = Column(Integer, nullable=False)
-    opened = Column(Boolean, nullable=True, default=None)
-    closed = Column(Boolean, nullable=True, default=None)
+    date_opened = Column(DateTime, nullable=True, default=None)
+    date_closed = Column(DateTime, nullable=True, default=None)
     max_solves = Column(Integer, nullable=True, default=1)
 
     solves = relationship('InjectSolve', backref='inject')
 
-    def is_open(self):
-        return self.closed is None and self.is_visible()
+    def can_submit(self):
+        return self.is_visible() and (self.date_closed is None or self.date_closed > datetime.datetime.now())
+
+    def open(self):
+        self.date_opened = datetime.datetime.now()
+        self.date_closed = None
+
+    def close(self):
+        self.date_closed = datetime.datetime.now()
 
     def is_visible(self):
-        return self.opened is not None
+        return self.date_opened is not None and self.date_opened < datetime.datetime.now()
 
     def is_unlimited(self):
         return self.max_solves == self.UNLIMITED_SOLVES
@@ -51,4 +59,4 @@ class InjectSolve(Base):
     value_approved = Column(Integer, nullable=True)
 
     def is_reviewed(self):
-        return self.date_reviewed is None
+        return self.date_reviewed is not None
