@@ -17,6 +17,23 @@
                     {{ inject.title }}
                 </h2>
                 <p>{{ inject.body|nl2br }}</p>
+                <p>
+                    <h3>Solves:
+                    {{ solve_count(team, inject) }} /
+                    {% if inject.is_unlimited() %}
+                        Unlimited
+                    {% else %}
+                        {{ inject.max_solves }}
+                    {% endif %}
+                    {% if can_submit_inject(team, inject) %}
+                        <a href="{{ url_for('scoring.solve_inject', inject_id=inject.id) }}"
+                           class="btn btn-{% if has_pending_solve(team, inject) %}warning{% else %}primary{% endif %}">
+                            <span class="fa fa-check-square-o"></span>
+                            Request Solve
+                        </a>
+                    {% endif %}
+                    </h3>
+                </p>
             </li>
         {%  endfor %}
     </ul>

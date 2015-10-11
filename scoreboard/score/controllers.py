@@ -1,5 +1,6 @@
 # Import flask dependencies
-from flask import Blueprint, render_template
+import datetime
+from flask import abort, Blueprint, render_template
 
 # Import the database object from the main app module
 from flask.ext.login import current_user, login_required
@@ -7,8 +8,8 @@ from sqlalchemy.sql import functions, join, and_, or_
 from checks import ServiceCheck, CheckResult
 from checks.services import Service
 from scoreboard.app import db
+from scoreboard.score.inject_rules import score_injects, can_submit_inject, has_pending_solve, solve_count
 from scoring import FlagDiscovery, Flag, InjectSolve, Inject
-from scoring.inject import team_inject_relation
 from teams import Team
 
 mod_scoring = Blueprint('scoring', __name__, url_prefix='/scoring')
@@ -22,6 +23,10 @@ def render_scoring_page(*args, **kwargs):
 def render_inject_page(*args, **kwargs):
     kwargs['active_menu'] = 'injects'
     kwargs['team'] = current_user.team
+    kwargs['can_submit_inject'] = can_submit_inject
+    kwargs['has_pending_solve'] = has_pending_solve
+    kwargs['solve_count'] = solve_count
+
     return render_template(*args, **kwargs)
 
 
@@ -59,12 +64,7 @@ def team_score_list():
 
         flags = flags[0] if flags[0] else 0
 
-        injects = db.session \
-            .query(functions.sum(InjectSolve.value_approved)) \
-            .filter(and_(InjectSolve.team_id == team.id, InjectSolve.approved == True)) \
-            .first()
-
-        injects = injects[0] if injects[0] else 0
+        injects = score_injects(team)
 
         team.scores = {
             'services_earned': earned,
@@ -78,24 +78,44 @@ def team_score_list():
     return render_scoring_page('scoring/index.html', teams=scoring_teams)
 
 
+
 @mod_scoring.route('/injects', methods=['GET'])
 @login_required
-def list_injects():
+def list_available_injects():
     team = current_user.team
 
     query = Inject.query
     if team.role == Team.WHITE:
         injects = query.all()
+        return render_inject_page('scoring/injects-admin.html', injects=injects)
     else:
-        injects = []
-        for inject in team.available_injects:
-            if inject.enabled:
-                if inject.max_solves == -1 or team.inject_solves(inject) < inject.max_solves:
-                    inject.can_solve = True
-                else:
-                    inject.can_solve = False
-
-                injects.append(inject)
+        injects = [inject for inject in team.available_injects if inject.is_visible()]
+        return render_inject_page('scoring/injects.html', injects=injects)
 
 
-    return render_inject_page('scoring/injects.html', injects=injects)
+@mod_scoring.route('/injects/complete/<inject_id>', methods=['GET'])
+@login_required
+def solve_inject(inject_id):
+    team = current_user.team
+    inject = Inject.query.get(inject_id)
+    if not inject:
+        abort(404)
+        return "no."
+
+    if not inject.enabled:
+        abort(401)
+        return "no."
+
+    if not team.can_submit_inject(inject):
+        abort(401)
+        return "can't resolve."
+
+    team.solved_injects.append(InjectSolve(team_id=team.id, inject=inject, date_requested=datetime.datetime.now()))
+    db.session.commit()
+
+    return render_inject_page('scoring/injects.html', injects=[])
+
+@mod_scoring.route('/injects/manage/<solve_id>/<approve>', methods=['GET'])
+@login_required
+def manage_solve(solve_id, approve):
+    return "todo"

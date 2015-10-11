@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{%  block head %}
+    <style>
+        li {
+            list-style: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <h1>Inject Management</h1>
+    <ul>
+        {% for inject in injects %}
+            <li>
+                <h2>
+                    {{ inject.title }}
+                </h2>
+                <p>{{ inject.body|nl2br }}</p>
+                <p>
+                    {% if not inject.is_open() %}
+                        <a href="{{ url_for('scoring.open_inject', inject_id=inject.id) }}" class="btn btn-default">Open Inject</a>
+                    {% endif %}
+                    {% if inject.is_open() and inject.is_visible() %}
+                        <a href="{{ url_for('scoring.close_inject', inject_id=inject.id) }}" class="btn btn-default">Close Inject</a>
+                    {% endif %}
+                </p>
+                <ul>
+                    {% for solve in inject.solves %}
+                        <li>
+                            <strong>{{ solve.team.name }}</strong> submitted at {{ solve.date_requested }}.
+                            {% if solve.approved is None %}
+                                <a href="url_for('scoring.manage_solve', solve_id=solve.id, approve=True) }}" class="btn btn-success">Approve</a>
+                                <a href="url_for('scoring.manage_solve', solve_id=solve.id, approve=False) }}" class="btn btn-fail">Approve</a>
+                            {% elif solve.approved %}
+                                Approved at {{ solve.date_date_approved }}
+                                <a href="url_for('scoring.manage_solve', solve_id=solve.id, approve=False) }}" class="btn btn-success">Revoke Approval</a>
+                            {% else %}
+                                Rejected at {{ solve.date_date_approved }}
+                                <a href="url_for('scoring.manage_solve', solve_id=solve.id, approve=True) }}" class="btn btn-success">Revoke Approval</a>
+                            {% endif %}
+                        </li>
+                </ul>
+            </li>
+        {%  endfor %}
+    </ul>
+
+{% endblock %}

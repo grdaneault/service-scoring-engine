@@ -23,7 +23,7 @@ class User(Base, UserMixin):
     first_name = Column(String(100), nullable=False, server_default='')
     last_name = Column(String(100), nullable=False, server_default='')
 
-    team_id = Column(Integer, ForeignKey("team.id"))
+    team_id = Column(Integer, ForeignKey("team.id"), nullable=False)
     team = relationship("Team")
 
     def __init__(self, **kwargs):

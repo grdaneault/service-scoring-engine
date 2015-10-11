@@ -85,7 +85,16 @@ blue.services.append(create_ping_service('192.168.159.0/24'))
 blue.credentials.extend(blue_credentials)
 """
 
+teams = {
+    Team.RED: [],
+    Team.WHITE: [],
+    Team.BLUE: []
+}
+
+roles = [Team.RED, Team.WHITE, Team.BLUE]
+
 for team in [white, blue, red]:
+    teams[team.role].append(team)
     print('Initializing Team %s' % team.name)
     user = User(username='default_' + team.name.lower(),
                 password=user_manager.hash_password('default123'),
@@ -98,41 +107,47 @@ for team in [white, blue, red]:
         username = team.name.lower() + str(i)
         random_pass = ''.join(random.SystemRandom().choice(string.digits + string.ascii_letters) for _ in range(10))
         user = User(username=username,
-                    password=user_manager.hash_password(random_pass))
+                    password=user_manager.hash_password(random_pass),
+                    active=True,
+                    team=team)
 
         session.add(user)
         print('\t\tCreated user %s:%s' % (username, random_pass))
 
-    if team.role == Team.BLUE:
-        print('\n\tCreating Services')
-        pings = PingService(team.ip_space)
-        team.services.append(pings)
-        for machine in machines:
-            for service in machine.get_services(team):
-                if isinstance(service, PingCheck):
-                    pings.checks.append(service)
-                else:
-                    team.services.append(service)
-                    for check in service.checks:
-                        for credential in check.credentials:
-                            team.credentials.append(credential)
-                    print('\t\tCreated service %s on %s' % (service.friendly_name(), service.host))
-
-    print('\n\tCreating Flags')
+for team in teams[Team.BLUE]:
+    print('\n\tCreating Blue Team Services')
+    pings = PingService(team.ip_space)
+    team.services.append(pings)
     for machine in machines:
+        for service in machine.get_services(team):
+            if isinstance(service, PingCheck):
+                pings.checks.append(service)
+            else:
+                team.services.append(service)
+                for check in service.checks:
+                    for credential in check.credentials:
+                        team.credentials.append(credential)
+                print('\t\tCreated service %s on %s' % (service.friendly_name(), service.host))
+
+print('\n\tCreating Flags')
+for machine in machines:
+    for team in teams[Team.BLUE]:
         for flag in machine.get_flags(team):
             team.own_flags.append(flag)
             print('\t\tCreated flag %s' % flag.flag)
 
+for role in roles:
     print('\n\tCreating Injects')
     for machine in machines:
-        for inject in machine.get_injects(team):
-            team.available_injects.append(inject)
+        for inject in machine.get_injects(role):
             print('\t\tCreated inject %s (%s)' % (inject.title, inject.value))
+            for team in teams[role]:
+                team.available_injects.append(inject)
 
-    session.add(team)
 
 
-
+for role, team_list in teams.items():
+    for team in team_list:
+        session.add(team)
 
 session.commit()

@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship, backref
 from configuration.persistence import Base
-from scoring.inject import team_inject_relation
+from scoring.inject import team_inject_relation, Inject
 
 
 class Team(Base):
@@ -24,3 +24,6 @@ class Team(Base):
 
     available_injects = relationship('Inject', secondary=team_inject_relation, backref='teams')
     solved_injects = relationship('InjectSolve')
+
+
+
