@@ -115,7 +115,17 @@ def solve_inject(inject_id):
 
     return render_inject_page('scoring/injects.html', injects=[])
 
-@mod_scoring.route('/injects/manage/<solve_id>/<approve>', methods=['GET'])
+@mod_scoring.route('/injects/manage/solve/<solve_id>/<approve>', methods=['GET'])
 @login_required
 def manage_solve(solve_id, approve):
     return "todo"
+
+@mod_scoring.route('/injects/manage/inject/<inject_id>/open', methods=['GET'])
+@login_required
+def open_inject(inject_id):
+    return 'todo'
+
+@mod_scoring.route('/injects/manage/inject/<inject_id>/close', methods=['GET'])
+@login_required
+def close_inject(inject_id):
+    return 'todo'

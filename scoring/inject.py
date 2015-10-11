@@ -21,13 +21,14 @@ class Inject(Base):
     solves = relationship('InjectSolve', backref='inject')
 
     def is_open(self):
-        return self.closed is None
+        return self.closed is None and self.is_visible()
 
     def is_visible(self):
         return self.opened is not None
 
     def is_unlimited(self):
         return self.max_solves == self.UNLIMITED_SOLVES
+
 
 
 team_inject_relation = Table('inject_team_availability', Base.metadata,
@@ -46,5 +47,8 @@ class InjectSolve(Base):
     approver_id = Column(Integer, ForeignKey('user.id'), nullable=True)
     approving_user = relationship("User")
     date_requested = Column(DateTime, nullable=False)
-    date_approved = Column(DateTime, nullable=True)
+    date_reviewed = Column(DateTime, nullable=True)
     value_approved = Column(Integer, nullable=True)
+
+    def is_reviewed(self):
+        return self.date_reviewed is None
