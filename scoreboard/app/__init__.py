@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, flash
 from flask.ext.user import SQLAlchemyAdapter, UserManager
 from flask_sqlalchemy import SQLAlchemy, _QueryProperty, BaseQuery
 from jinja2 import evalcontextfilter, Markup, escape
@@ -35,7 +35,6 @@ def register_modules():
     app.register_blueprint(credentials_module)
     app.register_blueprint(scoring_module)
 
-
     _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
     @app.template_filter()
@@ -46,6 +45,11 @@ def register_modules():
         if eval_ctx.autoescape:
             result = Markup(result)
         return result
+
+def flash_errors(form):
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(u"Error: %s" % error, category='danger')
 
 # Start development web server
 if __name__ == '__main__':

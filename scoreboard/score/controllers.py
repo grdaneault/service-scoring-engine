@@ -7,7 +7,8 @@ from flask.ext.login import current_user, login_required
 from sqlalchemy.sql import functions, join, and_, or_
 from checks import ServiceCheck, CheckResult
 from checks.services import Service
-from scoreboard.app import db
+from scoreboard.app import db, flash_errors
+from scoreboard.score.forms import InjectApprovalForm
 from scoreboard.score.inject_rules import score_injects, can_submit_inject, has_pending_solve, solve_count
 from scoring import FlagDiscovery, Flag, InjectSolve, Inject
 from teams import Team
@@ -48,7 +49,7 @@ def team_score_list():
 
         earned = 0
         maximum = 0
-        if services:
+        if services[0]:
             earned = services[0]
             maximum = services[1]
 
@@ -115,10 +116,46 @@ def solve_inject(inject_id):
 
     return render_inject_page('scoring/injects.html', injects=[])
 
-@mod_scoring.route('/injects/manage/solve/<solve_id>/<approve>', methods=['GET'])
+@mod_scoring.route('/injects/manage/solve/<solve_id>/reject', methods=['GET'])
 @login_required
-def manage_solve(solve_id, approve):
-    return "todo"
+def reject_solve(solve_id):
+    if not current_user.team.role == Team.WHITE:
+        abort(401)
+        return "no."
+
+    solve = InjectSolve.query.get(solve_id)
+    if not solve:
+        flash('No solve with that ID exists', category='danger')
+        return redirect(url_for('scoring.list_available_injects'))
+
+    solve.reject(current_user)
+    db.session.commit()
+    flash('Solve request rejected', category='success')
+    return redirect(url_for('scoring.list_available_injects'))
+
+@mod_scoring.route('/injects/manage/solve/<solve_id>/approve', methods=['GET', 'POST'])
+@login_required
+def approve_solve(solve_id):
+    if not current_user.team.role == Team.WHITE:
+        abort(401)
+        return "no."
+
+    solve = InjectSolve.query.get(solve_id)
+    if not solve:
+        flash('No solve with that ID exists', category='danger')
+        return redirect(url_for('scoring.list_available_injects'))
+
+    form = InjectApprovalForm()
+    if form.validate_on_submit():
+        solve.approve(current_user, int(form.value.data))
+        db.session.commit()
+        flash('Awarded %s points to %s for solving %s' % (form.value.data, solve.team.name, solve.inject.title))
+        return redirect(url_for('scoring.list_available_injects'))
+    else:
+        flash_errors(form)
+
+    return render_inject_page('scoring/injects-approve.html', form=form, solve=solve)
+
 
 @mod_scoring.route('/injects/manage/inject/<inject_id>/open', methods=['GET'])
 @login_required

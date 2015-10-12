@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Approve Inject for {{ solve.team.name }}
+{%  endblock %}
+
+{% block content %}
+
+    <div class="page-header">
+        <h1>
+            <span class="fa fa-briefcase"></span>
+            Approve solve of <strong>{{ solve.inject.title }}</strong>
+            for <strong>{{ solve.team.name }}</strong>
+        </h1>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-md-4">
+            <form method="POST" action="{{ url_for('scoring.approve_solve', solve_id=solve.id) }}">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    <label for="value">
+                        {{ form.value.label }}
+                    </label>
+                    {{ form.value(size=50, class_="form-control") }}
+                </div>
+
+                <button type="submit" class="btn btn-default" value="Save"><span class="fa fa-save"></span> Save</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -33,6 +33,9 @@
                             Request Solve
                         </a>
                     {% endif %}
+                    {% if has_pending_solve(team, inject) %}
+                        <span class="label label-warning">Approval Pending</span>
+                    {% endif %}
                     </h3>
                 </p>
             </li>

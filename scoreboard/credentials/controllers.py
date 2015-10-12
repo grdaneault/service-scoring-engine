@@ -5,7 +5,7 @@ from flask import abort, Blueprint, redirect, url_for, render_template, flash
 from flask.ext.login import current_user, login_required
 from checks import ServiceCheck, CheckCredentials
 from checks.services import Service
-from scoreboard.app import db
+from scoreboard.app import db, flash_errors
 from scoreboard.credentials.forms import PasswordChangeForm
 
 mod_credentials = Blueprint('credentials', __name__, url_prefix='/credentials')
@@ -46,9 +46,3 @@ def team_credential_edit(credential_id):
                                    form=form,
                                    team=team,
                                    credential=credential)
-
-
-def flash_errors(form):
-    for field, errors in form.errors.items():
-        for error in errors:
-            flash(u"Error: %s" % error, category='danger')

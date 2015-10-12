@@ -39,15 +39,16 @@
                             <strong>{{ solve.team.name }}</strong> submitted at {{ solve.date_requested }}.
                             {% if not solve.is_reviewed() %}
                                 <div class="btn-group" role="group">
-                                    <a href="{{ url_for('scoring.manage_solve', solve_id=solve.id, approve=True) }}" class="btn btn-sm btn-success">Approve</a>
-                                    <a href="{{ url_for('scoring.manage_solve', solve_id=solve.id, approve=False) }}" class="btn btn-sm btn-danger">Reject</a>
+                                    <a href="{{ url_for('scoring.approve_solve', solve_id=solve.id) }}" class="btn btn-xs btn-success">Approve</a>
+                                    <a href="{{ url_for('scoring.reject_solve', solve_id=solve.id) }}" class="btn btn-xs btn-danger">Reject</a>
                                 </div>
-                            {% elif solve.approved %}
-                                Approved at {{ solve.date_date_approved }}
-                                <a href="{{ url_for('scoring.manage_solve', solve_id=solve.id, approve=False) }}" class="btn btn-sm btn-success">Revoke Approval</a>
                             {% else %}
-                                Rejected at {{ solve.date_date_approved }}
-                                <a href="{{ url_for('scoring.manage_solve', solve_id=solve.id, approve=True) }}" class="btn btn-sm btn-success">Revoke Approval</a>
+                                {% if solve.approved %}
+                                    Approved
+                                {% else %}
+                                    Rejected
+                                {% endif %}
+                                    at {{ solve.date_reviewed }}
                             {% endif %}
                         </li>
                     {% endfor %}

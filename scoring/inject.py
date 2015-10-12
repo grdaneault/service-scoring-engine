@@ -52,11 +52,23 @@ class InjectSolve(Base):
     team_id = Column(Integer, ForeignKey('team.id'), nullable=False)
     inject_id = Column(Integer, ForeignKey('inject.id'), nullable=False)
     approved = Column(Boolean, nullable=True, default=None)
-    approver_id = Column(Integer, ForeignKey('user.id'), nullable=True)
-    approving_user = relationship("User")
+    reviewing_user_id = Column(Integer, ForeignKey('user.id'), nullable=True)
+    reviewing_user = relationship("User")
     date_requested = Column(DateTime, nullable=False)
     date_reviewed = Column(DateTime, nullable=True)
     value_approved = Column(Integer, nullable=True)
 
     def is_reviewed(self):
         return self.date_reviewed is not None
+
+    def reject(self, reviewer):
+        self.approved = False
+        self.value_approved = 0
+        self.date_reviewed = datetime.datetime.now()
+        self.reviewing_user = reviewer
+
+    def approve(self, reviewer, value):
+        self.approved = True
+        self.value_approved = value
+        self.date_reviewed = datetime.datetime.now()
+        self.reviewing_user = reviewer
