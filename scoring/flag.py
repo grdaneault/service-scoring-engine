@@ -1,5 +1,7 @@
+import datetime
 from sqlalchemy import Column, String, ForeignKey, Text, DateTime
 from sqlalchemy import Integer
+from sqlalchemy.orm import relationship
 from configuration.persistence import Base
 
 
@@ -17,6 +19,11 @@ class FlagDiscovery(Base):
     __tablename__ = 'flag_discovery'
     id = Column(Integer, primary_key=True)
     flag_id = Column(Integer, ForeignKey('flag.id'))
+    flag = relationship('Flag', backref='discoveries')
     team_id = Column(Integer, ForeignKey('team.id'))
 
     discovered = Column(DateTime, nullable=False)
+
+    def __init__(self, *args, **kwargs):
+        Base.__init__(self, *args, **kwargs)
+        self.discovered = datetime.datetime.now()

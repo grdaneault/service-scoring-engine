@@ -8,7 +8,8 @@ from sqlalchemy.sql import functions, join, and_, or_
 from checks import ServiceCheck, CheckResult
 from checks.services import Service
 from scoreboard.app import db, flash_errors
-from scoreboard.score.forms import InjectApprovalForm
+from scoreboard.score.flag_rules import has_flag
+from scoreboard.score.forms import InjectApprovalForm, FlagSolveForm
 from scoreboard.score.inject_rules import score_injects, can_submit_inject, has_pending_solve, solve_count, \
     team_solve_attempts
 from scoring import FlagDiscovery, Flag, InjectSolve, Inject
@@ -29,6 +30,12 @@ def render_inject_page(*args, **kwargs):
     kwargs['has_pending_solve'] = has_pending_solve
     kwargs['solve_count'] = solve_count
     kwargs['team_solve_attempts'] = team_solve_attempts
+
+    return render_template(*args, **kwargs)
+
+def render_flags_page(*args, **kwargs):
+    kwargs['active_menu'] = 'flags'
+    kwargs['team'] = current_user.team
 
     return render_template(*args, **kwargs)
 
@@ -231,3 +238,36 @@ def hide_inject(inject_id):
         flash('Inject %s Hidden!' % inject.title, category='success')
 
     return redirect(url_for('scoring.list_available_injects'))
+
+
+@mod_scoring.route('/flags', methods=['GET'])
+@login_required
+def list_flags():
+
+    if current_user.team.role == Team.WHITE:
+        flags = Flag.query.all()
+        return render_flags_page('scoring/flags/admin.html', flags=flags)
+    else:
+        flags = current_user.team.solved_flags
+        form = FlagSolveForm()
+        return render_flags_page('scoring/flags/index.html', flags=flags, form=form)
+
+@mod_scoring.route('/flags', methods=['POST'])
+@login_required
+def solve_flag():
+    form = FlagSolveForm()
+    if form.validate_on_submit():
+        if has_flag(current_user.team, form.flag.data):
+            flash('You already discovered flag \'%s\'.' % form.flag.data, category='danger')
+        else:
+            flag = Flag.query.filter_by(flag=form.flag.data).first()
+            if flag is not None:
+                current_user.team.solved_flags.append(FlagDiscovery(team=current_user.team, flag=flag))
+                db.session.commit()
+                flash('Flag \'%s\' discovered for %s points!' % (flag.flag, flag.value), category='success')
+            else:
+                flash('Flag \'%s\' not found.' % form.flag.data, category='danger')
+    else:
+        flash_errors(form)
+
+    return redirect(url_for('scoring.list_flags'))

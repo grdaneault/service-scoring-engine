@@ -20,7 +20,7 @@ class Team(Base):
     services = relationship('Service', order_by='Service.id', backref=backref('team'))
     credentials = relationship('CheckCredentials')
     own_flags = relationship('Flag')
-    solved_flags = relationship('FlagDiscovery')
+    solved_flags = relationship('FlagDiscovery', backref='team')
 
     available_injects = relationship('Inject', secondary=team_inject_relation, backref='teams')
     solved_injects = relationship('InjectSolve', backref='team')
