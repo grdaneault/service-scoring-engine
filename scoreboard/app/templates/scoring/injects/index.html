@@ -16,52 +16,57 @@ Available injects for {{ team.name }}
     <div class="page-header">
         <h1>Available injects for {{ team.name }}</h1>
     </div>
-    <ul>
-        {% for inject in injects %}
-            <li>
-                <h2>
-                    {{ inject.title }}
-                    <small>{{ inject.value }} Points</small>
-                </h2>
-                <p>{{ inject.body|nl2br }}</p>
-                <p>
-                    <h3>Solves:
-                    {{ solve_count(team, inject) }} /
-                    {% if inject.is_unlimited() %}
-                        Unlimited
-                    {% else %}
-                        {{ inject.max_solves }}
-                    {% endif %}
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+            {% for inject in injects %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">
+                            {{ inject.title }}
+                            <small>{{ inject.value }} Points</small>
+                            <span class="label label-{% if can_submit_inject(team, inject) %}primary{% else %}default{% endif %} pull-right">
+                                {{ solve_count(team, inject) }} /
+                                {% if inject.is_unlimited() %}
+                                    Unlimited
+                                {% else %}
+                                    {{ inject.max_solves }}
+                                {% endif %}
+                                Solves
+                            </span>
+                        </h2>
+                    </div>
+                    <div class="panel-body">
+                        {{ inject.body|nl2br }}
+                    </div>
                     {% if can_submit_inject(team, inject) %}
-                        <small>
-                            <a href="{{ url_for('scoring.solve_inject', inject_id=inject.id) }}"
-                               class="btn btn-{% if has_pending_solve(team, inject) %}warning{% else %}primary{% endif %}">
-                                <span class="fa fa-check-square-o"></span>
-                                Request Solve
-                            </a>
-                        </small>
+                        <div class="panel-body">
+                                <a href="{{ url_for('scoring.solve_inject', inject_id=inject.id) }}"
+                                   class="btn btn-{% if has_pending_solve(team, inject) %}warning{% else %}primary{% endif %}">
+                                    <span class="fa fa-check-square-o"></span>
+                                    Request Solve
+                                </a>
+                        </div>
                     {% endif %}
-                    </h3>
-
-                    <ul>
+                    <ul class="list-group">
                         {% for solve in team_solve_attempts(team, inject) %}
-                            <li>
+                            <li class="list-group-item">
                                 <strong>{{ solve.requesting_user.username }}</strong> submitted at {{ solve.date_requested }}.
                                 {% if not solve.is_reviewed() %}
-                                    <span class="label label-warning">Pending</span>
+                                    <span class="label label-warning pull-right">Pending</span>
                                 {% else %}
                                     {% if solve.approved %}
-                                        <span class="label label-primary">Approved for {{ solve.value_approved }} points</span>
+                                        <span class="label label-primary pull-right">Approved for {{ solve.value_approved }} points</span>
                                     {% else %}
-                                        <span class="label label-danger">Rejected</span>
+                                        <span class="label label-danger pull-right">Rejected</span>
                                     {% endif %}
                                 {% endif %}
                             </li>
                         {% endfor %}
                     </ul>
-                </p>
-            </li>
-        {%  endfor %}
-    </ul>
+                </div>
+            {%  endfor %}
+
+        </div>
+    </div>
 
 {% endblock %}
