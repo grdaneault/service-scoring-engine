@@ -9,7 +9,8 @@ from checks import ServiceCheck, CheckResult
 from checks.services import Service
 from scoreboard.app import db, flash_errors
 from scoreboard.score.forms import InjectApprovalForm
-from scoreboard.score.inject_rules import score_injects, can_submit_inject, has_pending_solve, solve_count
+from scoreboard.score.inject_rules import score_injects, can_submit_inject, has_pending_solve, solve_count, \
+    team_solve_attempts
 from scoring import FlagDiscovery, Flag, InjectSolve, Inject
 from teams import Team
 
@@ -27,6 +28,7 @@ def render_inject_page(*args, **kwargs):
     kwargs['can_submit_inject'] = can_submit_inject
     kwargs['has_pending_solve'] = has_pending_solve
     kwargs['solve_count'] = solve_count
+    kwargs['team_solve_attempts'] = team_solve_attempts
 
     return render_template(*args, **kwargs)
 
@@ -79,7 +81,6 @@ def team_score_list():
     return render_scoring_page('scoring/index.html', teams=scoring_teams)
 
 
-
 @mod_scoring.route('/injects', methods=['GET'])
 @login_required
 def list_available_injects():
@@ -111,10 +112,17 @@ def solve_inject(inject_id):
         abort(401)
         return "can't resolve."
 
-    team.solved_injects.append(InjectSolve(team_id=team.id, inject=inject, date_requested=datetime.datetime.now()))
+    team.solved_injects.append(InjectSolve(
+        team_id=team.id,
+        inject=inject,
+        date_requested=datetime.datetime.now(),
+        requesting_user=current_user
+    ))
     db.session.commit()
 
-    return render_inject_page('scoring/injects.html', injects=[])
+    flash('Your request for the inject %s will be reviewed shortly' % inject.title, category='info')
+    return redirect(url_for('scoring.list_available_injects'))
+
 
 @mod_scoring.route('/injects/manage/solve/<solve_id>/reject', methods=['GET'])
 @login_required
@@ -132,6 +140,7 @@ def reject_solve(solve_id):
     db.session.commit()
     flash('Solve request rejected', category='success')
     return redirect(url_for('scoring.list_available_injects'))
+
 
 @mod_scoring.route('/injects/manage/solve/<solve_id>/approve', methods=['GET', 'POST'])
 @login_required
@@ -154,6 +163,8 @@ def approve_solve(solve_id):
     else:
         flash_errors(form)
 
+    form.value.data = solve.inject.value
+
     return render_inject_page('scoring/injects-approve.html', form=form, solve=solve)
 
 
@@ -169,14 +180,15 @@ def open_inject(inject_id):
         abort(404)
         return 'inject not found'
 
-    if inject.is_visible():
-        flash('Inject %s (%s) is already open.' % (inject.title, inject.id), category='danger')
+    if inject.can_submit():
+        flash('Inject %s is already open.' % inject.title, category='danger')
     else:
         inject.open()
         db.session.commit()
-        flash('Inject %s (%s) Opened!.' % (inject.title, inject.id), category='success')
+        flash('Inject %s Opened!' % inject.title, category='success')
 
     return redirect(url_for('scoring.list_available_injects'))
+
 
 @mod_scoring.route('/injects/manage/inject/<inject_id>/close', methods=['GET'])
 @login_required
@@ -190,11 +202,32 @@ def close_inject(inject_id):
         abort(404)
         return 'inject not found'
 
-    if not inject.is_visible():
-        flash('Inject %s (%s) is already closed.' % (inject.title, inject.id), category='danger')
+    if not inject.can_submit():
+        flash('Inject %s is already closed.' % inject.title, category='danger')
     else:
         inject.close()
         db.session.commit()
-        flash('Inject %s (%s) Closed!' % (inject.title, inject.id), category='success')
+        flash('Inject %s Closed!' % inject.title, category='success')
+
+    return redirect(url_for('scoring.list_available_injects'))
+
+@mod_scoring.route('/injects/manage/inject/<inject_id>/hide', methods=['GET'])
+@login_required
+def hide_inject(inject_id):
+    if not current_user.team.role == Team.WHITE:
+        abort(401)
+        return "no."
+
+    inject = Inject.query.get(inject_id)
+    if not inject:
+        abort(404)
+        return 'inject not found'
+
+    if not inject.is_visible():
+        flash('Inject %s is already hidden.' % inject.title, category='danger')
+    else:
+        inject.close_and_hide()
+        db.session.commit()
+        flash('Inject %s Hidden!' % inject.title, category='success')
 
     return redirect(url_for('scoring.list_available_injects'))

@@ -18,6 +18,8 @@ def score_injects(team):
     injects = injects[0] if injects[0] else 0
     return injects
 
+def team_solve_attempts(team, inject):
+    return [solve for solve in team.solved_injects if solve.inject_id == inject.id]
 
 def solve_count(team, inject):
     """

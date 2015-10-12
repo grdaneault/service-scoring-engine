@@ -9,7 +9,9 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Available injects for {{ team.name }}</h1>
+    <div class="page-header">
+        <h1>Available injects for {{ team.name }}</h1>
+    </div>
     <ul>
         {% for inject in injects %}
             <li>
@@ -27,16 +29,32 @@
                         {{ inject.max_solves }}
                     {% endif %}
                     {% if can_submit_inject(team, inject) %}
-                        <a href="{{ url_for('scoring.solve_inject', inject_id=inject.id) }}"
-                           class="btn btn-{% if has_pending_solve(team, inject) %}warning{% else %}primary{% endif %}">
-                            <span class="fa fa-check-square-o"></span>
-                            Request Solve
-                        </a>
-                    {% endif %}
-                    {% if has_pending_solve(team, inject) %}
-                        <span class="label label-warning">Approval Pending</span>
+                        <small>
+                            <a href="{{ url_for('scoring.solve_inject', inject_id=inject.id) }}"
+                               class="btn btn-{% if has_pending_solve(team, inject) %}warning{% else %}primary{% endif %}">
+                                <span class="fa fa-check-square-o"></span>
+                                Request Solve
+                            </a>
+                        </small>
                     {% endif %}
                     </h3>
+
+                    <ul>
+                        {% for solve in team_solve_attempts(team, inject) %}
+                            <li>
+                                <strong>{{ solve.requesting_user.username }}</strong> submitted at {{ solve.date_requested }}.
+                                {% if not solve.is_reviewed() %}
+                                    <span class="label label-warning">Pending</span>
+                                {% else %}
+                                    {% if solve.approved %}
+                                        <span class="label label-primary">Approved for {{ solve.value_approved }} points</span>
+                                    {% else %}
+                                        <span class="label label-danger">Rejected</span>
+                                    {% endif %}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
                 </p>
             </li>
         {%  endfor %}

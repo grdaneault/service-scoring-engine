@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
-
+{% block title %}
+Inject Management
+{% endblock %}
 {%  block head %}
     <style>
         li {
@@ -13,7 +15,9 @@
 {% endblock %}
 
 {% block content %}
-    <h1>Inject Management</h1>
+    <div class="page-header">
+        <h1>Inject Management</h1>
+    </div>
     <ul>
         {% for inject in injects %}
             <li>
@@ -27,11 +31,16 @@
                 </h2>
                 <p>{{ inject.body|nl2br }}</p>
                 <p>
-                    {% if not inject.can_submit() %}
-                        <a href="{{ url_for('scoring.open_inject', inject_id=inject.id) }}" class="btn btn-success">Enable Inject</a>
-                    {% else %}
-                        <a href="{{ url_for('scoring.close_inject', inject_id=inject.id) }}" class="btn btn-danger">Close Inject</a>
-                    {% endif %}
+                    <div class="btn-group">
+                        {% if not inject.can_submit() %}
+                            <a href="{{ url_for('scoring.open_inject', inject_id=inject.id) }}" class="btn btn-primary">Enable Inject</a>
+                        {% else %}
+                            <a href="{{ url_for('scoring.close_inject', inject_id=inject.id) }}" class="btn btn-default">Close Inject</a>
+                        {% endif %}
+                        {% if inject.is_visible() %}
+                            <a href="{{ url_for('scoring.hide_inject', inject_id=inject.id) }}" class="btn btn-default">Hide Inject</a>
+                        {% endif %}
+                    </div>
                 </p>
                 <ul>
                     {% for solve in inject.solves %}
@@ -44,11 +53,10 @@
                                 </div>
                             {% else %}
                                 {% if solve.approved %}
-                                    Approved
+                                    <span class="label label-primary">Approved for {{ solve.value_approved }} points</span>
                                 {% else %}
-                                    Rejected
+                                    <span class="label label-danger">Rejected</span>
                                 {% endif %}
-                                    at {{ solve.date_reviewed }}
                             {% endif %}
                         </li>
                     {% endfor %}

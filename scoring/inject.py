@@ -31,6 +31,10 @@ class Inject(Base):
     def close(self):
         self.date_closed = datetime.datetime.now()
 
+    def close_and_hide(self):
+        self.close()
+        self.date_opened = None
+
     def is_visible(self):
         return self.date_opened is not None and self.date_opened < datetime.datetime.now()
 
@@ -53,7 +57,9 @@ class InjectSolve(Base):
     inject_id = Column(Integer, ForeignKey('inject.id'), nullable=False)
     approved = Column(Boolean, nullable=True, default=None)
     reviewing_user_id = Column(Integer, ForeignKey('user.id'), nullable=True)
-    reviewing_user = relationship("User")
+    reviewing_user = relationship("User", foreign_keys=[reviewing_user_id])
+    requesting_user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    requesting_user = relationship('User', foreign_keys=[requesting_user_id])
     date_requested = Column(DateTime, nullable=False)
     date_reviewed = Column(DateTime, nullable=True)
     value_approved = Column(Integer, nullable=True)

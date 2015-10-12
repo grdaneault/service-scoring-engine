@@ -21,7 +21,7 @@
                     <label for="value">
                         {{ form.value.label }}
                     </label>
-                    {{ form.value(size=50, class_="form-control") }}
+                    {{ form.value(size=50, class_="form-control", default=solve.inject.value) }}
                 </div>
 
                 <button type="submit" class="btn btn-default" value="Save"><span class="fa fa-save"></span> Save</button>
