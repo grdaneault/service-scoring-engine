@@ -7,6 +7,14 @@ Scoring Information
         li {
             list-style: none;
         }
+
+        .red {
+            color: red;
+        }
+
+        .blue {
+            color: blue
+        }
     </style>
 {% endblock %}
 
@@ -16,32 +24,36 @@ Scoring Information
         {% for team in teams %}
             <li class="credential">
                 <h2>
-                    <span class="fa fa-users fa-padded-left"></span>
+                    <span class="fa fa-users fa-padded-left {{ team.role }}"></span>
                     {{ team.name }}
                 </h2>
                 <ul>
                     {% if team.services %}
-                    <li>
-                        <h3>
-                            Service Checks:
-                            <strong>{{ team.scores['services_earned'] }} / {{ team.scores['services_maximum'] }}</strong>
-                    </li>
+                        <li>
+                            <h3>
+                                <i class="fa fa-tasks"></i>
+                                Service Checks:
+                                <strong>{{ team.scores['services_earned'] }} / {{ team.scores['services_maximum'] }}</strong>
+                            </h3>
+                        </li>
                     {% endif %}
                     {% if team.available_injects %}
-                    <li>
-                        <h3>
-                            Injects:
-                            <strong>{{ team.scores['injects_earned'] }}</strong>
-                        </h3>
-                    </li>
+                        <li>
+                            <h3>
+                                <i class="fa fa-briefcase"></i>
+                                Injects:
+                                <strong>{{ team.scores['injects_earned'] }}</strong>
+                            </h3>
+                        </li>
                     {% endif %}
                     {% if team.own_flags %}
-                    <li>
-                        <h3>
-                            Flags Lost:
-                            <strong>{{ team.scores['flags_lost'] }}</strong>
-                        </h3>
-                    </li>
+                        <li>
+                            <h3>
+                                <i class="fa fa-flag"></i>
+                                Flags Lost:
+                                <strong>{{ team.scores['flags_lost'] }}</strong>
+                            </h3>
+                        </li>
                     {% endif %}
                 </ul>
             </li>

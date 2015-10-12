@@ -34,7 +34,7 @@ def render_inject_page(*args, **kwargs):
 @mod_scoring.route('/', methods=['GET'])
 @login_required
 def team_score_list():
-    teams = Team.query.filter_by(role=Team.BLUE)
+    teams = Team.query.filter(Team.role.in_([Team.BLUE, Team.RED]))
     scoring_teams = []
     for team in teams:
         temp = db.session.query(
@@ -181,4 +181,20 @@ def open_inject(inject_id):
 @mod_scoring.route('/injects/manage/inject/<inject_id>/close', methods=['GET'])
 @login_required
 def close_inject(inject_id):
-    return 'todo'
+    if not current_user.team.role == Team.WHITE:
+        abort(401)
+        return "no."
+
+    inject = Inject.query.get(inject_id)
+    if not inject:
+        abort(404)
+        return 'inject not found'
+
+    if not inject.is_visible():
+        flash('Inject %s (%s) is already closed.' % (inject.title, inject.id), category='danger')
+    else:
+        inject.close()
+        db.session.commit()
+        flash('Inject %s (%s) Closed!' % (inject.title, inject.id), category='success')
+
+    return redirect(url_for('scoring.list_available_injects'))
