@@ -89,10 +89,10 @@ def list_available_injects():
     query = Inject.query
     if team.role == Team.WHITE:
         injects = query.all()
-        return render_inject_page('scoring/injects-admin.html', injects=injects)
+        return render_inject_page('scoring/injects/admin.html', injects=injects)
     else:
         injects = [inject for inject in team.available_injects if inject.is_visible()]
-        return render_inject_page('scoring/injects.html', injects=injects)
+        return render_inject_page('scoring/injects/index.html', injects=injects)
 
 
 @mod_scoring.route('/injects/complete/<inject_id>', methods=['GET'])
@@ -165,7 +165,7 @@ def approve_solve(solve_id):
 
     form.value.data = solve.inject.value
 
-    return render_inject_page('scoring/injects-approve.html', form=form, solve=solve)
+    return render_inject_page('scoring/injects/approve.html', form=form, solve=solve)
 
 
 @mod_scoring.route('/injects/manage/inject/<inject_id>/open', methods=['GET'])
