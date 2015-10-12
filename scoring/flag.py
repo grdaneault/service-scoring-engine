@@ -22,7 +22,7 @@ class FlagDiscovery(Base):
     flag = relationship('Flag', backref='discoveries')
     team_id = Column(Integer, ForeignKey('team.id'))
 
-    discovered = Column(DateTime, nullable=False)
+    date_discovered = Column(DateTime, nullable=False)
 
     def __init__(self, *args, **kwargs):
         Base.__init__(self, *args, **kwargs)

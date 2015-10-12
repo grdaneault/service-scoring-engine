@@ -18,51 +18,56 @@ Inject Management
     <div class="page-header">
         <h1>Inject Management</h1>
     </div>
-    <ul>
-        {% for inject in injects %}
-            <li>
-                <h2>
-                    {{ inject.title }}
-                    <small>{{ inject.value }} Points.
-                        {% for team in inject.teams %}
-                            <span class="label label-{% if team.role == 'blue' %}primary{% else %}danger{% endif %}">{{ team.name }}</span>
-                        {% endfor %}
-                    </small>
-                </h2>
-                <p>{{ inject.body|nl2br }}</p>
-                <p>
-                    <div class="btn-group">
-                        {% if not inject.can_submit() %}
-                            <a href="{{ url_for('scoring.open_inject', inject_id=inject.id) }}" class="btn btn-primary">Enable Inject</a>
-                        {% else %}
-                            <a href="{{ url_for('scoring.close_inject', inject_id=inject.id) }}" class="btn btn-default">Close Inject</a>
-                        {% endif %}
-                        {% if inject.is_visible() %}
-                            <a href="{{ url_for('scoring.hide_inject', inject_id=inject.id) }}" class="btn btn-default">Hide Inject</a>
-                        {% endif %}
+    <div class="row">
+        <div class="col-xs-12 col-md-6 col-md-offset-1">
+            {% for inject in injects %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">
+                            {{ inject.title }}
+                            <small>{{ inject.value }} Points.</small>
+                            {% for team in inject.teams %}
+                                <span class="pull-right label label-{% if team.role == 'blue' %}primary{% else %}danger{% endif %}">{{ team.name }}</span>
+                            {% endfor %}
+                        </h2>
                     </div>
-                </p>
-                <ul>
-                    {% for solve in inject.solves %}
-                        <li>
-                            <strong>{{ solve.team.name }}</strong> submitted at {{ solve.date_requested }}.
-                            {% if not solve.is_reviewed() %}
-                                <div class="btn-group" role="group">
-                                    <a href="{{ url_for('scoring.approve_solve', solve_id=solve.id) }}" class="btn btn-xs btn-success">Approve</a>
-                                    <a href="{{ url_for('scoring.reject_solve', solve_id=solve.id) }}" class="btn btn-xs btn-danger">Reject</a>
-                                </div>
+                    <div class="panel-body">
+                        {{ inject.body|nl2br }}
+                    </div>
+                    <div class="panel-body">
+                        <div class="btn-group">
+                            {% if not inject.can_submit() %}
+                                <a href="{{ url_for('scoring.open_inject', inject_id=inject.id) }}" class="btn btn-primary">Enable Inject</a>
                             {% else %}
-                                {% if solve.approved %}
-                                    <span class="label label-primary">Approved for {{ solve.value_approved }} points</span>
-                                {% else %}
-                                    <span class="label label-danger">Rejected</span>
-                                {% endif %}
+                                <a href="{{ url_for('scoring.close_inject', inject_id=inject.id) }}" class="btn btn-default">Close Inject</a>
                             {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
-        {%  endfor %}
-    </ul>
+                            {% if inject.is_visible() %}
+                                <a href="{{ url_for('scoring.hide_inject', inject_id=inject.id) }}" class="btn btn-default">Hide Inject</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <ul class="list-group">
+                        {% for solve in inject.solves %}
+                            <li class="list-group-item">
+                                <strong>{{ solve.team.name }}</strong> submitted at {{ solve.date_requested }}.
+                                {% if not solve.is_reviewed() %}
+                                    <div class="btn-group pull-right" role="group">
+                                        <a href="{{ url_for('scoring.approve_solve', solve_id=solve.id) }}" class="btn btn-xs btn-primary">Approve</a>
+                                        <a href="{{ url_for('scoring.reject_solve', solve_id=solve.id) }}" class="btn btn-xs btn-danger">Reject</a>
+                                    </div>
+                                {% else %}
+                                    {% if solve.approved %}
+                                        <span class="label label-primary pull-right">Approved for {{ solve.value_approved }} points</span>
+                                    {% else %}
+                                        <span class="label label-danger pull-right">Rejected</span>
+                                    {% endif %}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {%  endfor %}
+        </div>
+    </div>
 
 {% endblock %}

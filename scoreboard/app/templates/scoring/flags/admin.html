@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Flag Status
+{% endblock %}
+
+{%  block head %}
+    <style>
+        li {
+            list-style: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>Flag Status</h1>
+    </div>
+    <ul>
+        {% for flag in flags%}
+            <li>
+                <h2>
+                    {{ flag.flag }}
+                    <small>{{ flag.value }} Points</small>
+                </h2>
+                <p>{{ flag.description|nl2br }}</p>
+                <ul>
+                    {% for solve in flag.discoveries %}
+                        <li><strong>{{ solve.team.name }}</strong> discovered at {{ solve.date_discovered }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {%  endfor %}
+    </ul>
+{% endblock %}
