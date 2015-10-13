@@ -1,13 +1,10 @@
-import random
-import string
-
 from sqlalchemy.orm import sessionmaker
 
 from checks.services.check_ping import PingService, PingCheck
 from configuration.cdt import machines
+from configuration.cdt.users import get_users_for_team
 from configuration.models import create_tables
-from scoreboard.app import db, user_manager
-from teams.user import User
+from scoreboard.app import db
 from teams.team import Team
 
 create_tables(db.engine)
@@ -96,23 +93,10 @@ roles = [Team.RED, Team.WHITE, Team.BLUE]
 for team in [white, blue, red]:
     teams[team.role].append(team)
     print('Initializing Team %s' % team.name)
-    user = User(username='default_' + team.name.lower(),
-                password=user_manager.hash_password('default123'),
-                active=True,
-                team=team)
-    session.add(user)
+    session.add(team)
+    users = get_users_for_team(team)
+    session.add_all(users)
 
-    print('\tCreating Users')
-    for i in range(1, 4):
-        username = team.name.lower() + str(i)
-        random_pass = ''.join(random.SystemRandom().choice(string.digits + string.ascii_letters) for _ in range(10))
-        user = User(username=username,
-                    password=user_manager.hash_password(random_pass),
-                    active=True,
-                    team=team)
-
-        session.add(user)
-        print('\t\tCreated user %s:%s' % (username, random_pass))
 
 for team in teams[Team.BLUE]:
     print('\n\tCreating Blue Team Services')
@@ -144,10 +128,5 @@ for role in roles:
             for team in teams[role]:
                 team.available_injects.append(inject)
 
-
-
-for role, team_list in teams.items():
-    for team in team_list:
-        session.add(team)
 
 session.commit()

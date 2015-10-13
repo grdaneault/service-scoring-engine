@@ -27,7 +27,11 @@ class User(Base, UserMixin):
     team = relationship("Team")
 
     def __init__(self, **kwargs):
+        kwargs['username'] = kwargs['username'].lower()
         Base.__init__(self, **kwargs)
+
+    def get_name(self):
+        return '%s %s' % (self.first_name, self.last_name)
 
 class Role(Base):
     __tablename__ = 'role'

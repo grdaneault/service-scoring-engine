@@ -50,7 +50,7 @@ Available injects for {{ team.name }}
                     <ul class="list-group">
                         {% for solve in team_solve_attempts(team, inject) %}
                             <li class="list-group-item">
-                                <strong>{{ solve.requesting_user.username }}</strong> submitted at {{ solve.date_requested }}.
+                                <strong>{{ solve.requesting_user.get_name() }}</strong> submitted at {{ solve.date_requested }}.
                                 {% if not solve.is_reviewed() %}
                                     <span class="label label-warning pull-right">Pending</span>
                                 {% else %}

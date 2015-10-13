@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    User Profile | {{  user.get_name() }}
+{%  endblock %}
+
+{% block content %}
+    <h1><span class="fa fa-user"></span> {{ user.get_name() }} User Profile</h1>
+    <form method="POST" action="{{ url_for('credentials.team_credential_edit', credential_id=credential.id) }}">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label for="first_name">
+                {{ form.first_name.label }}
+            </label>
+            {{ form.first_name(size=50, class_="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="last_name">
+                {{ form.last_name.label }}
+            </label>
+            {{ form.last_name(size=50, class_="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="old_password">
+                {{ form.old_password.label }}
+            </label>
+            {{ form.old_password(size=50, class_="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="new_password">
+                {{ form.new_password.label }}
+            </label>
+            {{ form.new_password(size=50, class_="form-control") }}
+        </div>
+
+        <button type="submit" class="btn btn-default" value="Save"><span class="fa fa-lock"></span> Save</button>
+    </form>
+{% endblock %}

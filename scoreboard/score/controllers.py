@@ -262,7 +262,7 @@ def solve_flag():
         else:
             flag = Flag.query.filter_by(flag=form.flag.data).first()
             if flag is not None:
-                current_user.team.solved_flags.append(FlagDiscovery(team=current_user.team, flag=flag))
+                current_user.team.solved_flags.append(FlagDiscovery(team=current_user.team, user=current_user, flag=flag))
                 db.session.commit()
                 flash('Flag \'%s\' discovered for %s points!' % (flag.flag, flag.value), category='success')
             else:

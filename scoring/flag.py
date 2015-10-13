@@ -21,6 +21,8 @@ class FlagDiscovery(Base):
     flag_id = Column(Integer, ForeignKey('flag.id'))
     flag = relationship('Flag', backref='discoveries')
     team_id = Column(Integer, ForeignKey('team.id'))
+    discovery_user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    discovery_user = relationship('User')
 
     date_discovered = Column(DateTime, nullable=False)
 
