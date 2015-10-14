@@ -43,11 +43,11 @@
                 </h2>
             </div>
             <div class="panel-body">
-                {{ flag.description|nl2br }}
+                {{ solve.flag.description|nl2br }}
             </div>
             <ul class="list-group">
                 <li class="list-group-item">
-                    <strong>{{ solve.discovery_user.get_name() }} ({{ solve.team.name }})</strong>
+                    <strong>{{ solve.discovery_user.get_name() }}</strong>
                     discovered at {{ solve.date_discovered }}
                 </li>
             </ul>

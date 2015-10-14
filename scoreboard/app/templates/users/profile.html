@@ -24,13 +24,7 @@
             <label for="old_password">
                 {{ form.old_password.label }}
             </label>
-            {{ form.old_password(size=50, class_="form-control") }}
-        </div>
-        <div class="form-group">
-            <label for="new_password">
-                {{ form.new_password.label }}
-            </label>
-            {{ form.new_password(size=50, class_="form-control") }}
+            {{ form.display_name(size=50, class_="form-control") }}
         </div>
 
         <button type="submit" class="btn btn-default" value="Save"><span class="fa fa-lock"></span> Save</button>

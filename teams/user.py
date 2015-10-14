@@ -22,6 +22,7 @@ class User(Base, UserMixin):
     active = Column('is_active', Boolean(), nullable=False, server_default='0')
     first_name = Column(String(100), nullable=False, server_default='')
     last_name = Column(String(100), nullable=False, server_default='')
+    display_name = Column(String(100), nullable=True, )
 
     team_id = Column(Integer, ForeignKey("team.id"), nullable=False)
     team = relationship("Team")
@@ -31,7 +32,10 @@ class User(Base, UserMixin):
         Base.__init__(self, **kwargs)
 
     def get_name(self):
-        return '%s %s' % (self.first_name, self.last_name)
+        if self.display_name is None or self.display_name.strip() == '':
+            return '%s %s' % (self.first_name, self.last_name)
+        else:
+            return self.display_name
 
 class Role(Base):
     __tablename__ = 'role'

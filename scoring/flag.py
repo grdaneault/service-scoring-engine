@@ -28,4 +28,4 @@ class FlagDiscovery(Base):
 
     def __init__(self, *args, **kwargs):
         Base.__init__(self, *args, **kwargs)
-        self.discovered = datetime.datetime.now()
+        self.date_discovered = datetime.datetime.now()
