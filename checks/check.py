@@ -70,6 +70,8 @@ class CheckCredentials(Base):
     user = Column(String(255), nullable=False)
     password = Column(String(255), nullable=False)
     last_changed = Column(DateTime, nullable=True)
+    last_changed_user_id = Column(Integer, ForeignKey('user.id'), nullable=True)
+    last_changed_user = relationship('User')
     old_password = Column(String(255), nullable=True)
 
     checks = relationship('ServiceCheck', secondary=credentials_check_relation, backref='credentials')
