@@ -1,7 +1,6 @@
 from flask_wtf import Form
 from wtforms import StringField, DecimalField
-from wtforms.fields.core import LocaleAwareNumberField
-from wtforms.validators import DataRequired, NumberRange
+from wtforms.validators import DataRequired
 
 
 class InjectApprovalForm(Form):

@@ -29,11 +29,13 @@ def register_modules():
     from scoreboard.services.controllers import mod_services as services_module
     from scoreboard.credentials.controllers import mod_credentials as credentials_module
     from scoreboard.score.controllers import mod_scoring as scoring_module
+    from scoreboard.users.controllers import mod_users as users_module
 
     app.register_blueprint(status_module)
     app.register_blueprint(services_module)
     app.register_blueprint(credentials_module)
     app.register_blueprint(scoring_module)
+    app.register_blueprint(users_module)
 
     _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
