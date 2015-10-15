@@ -47,6 +47,9 @@ class WebService(Service):
                     return CheckResult(True, '%s contained check content' % self.get_url(check))
                 else:
                     return CheckResult(False, '%s did not contain \'%s\'' % (self.get_url(check), check.content))
+            elif check.check_mode == WebCheck.CONTENT_JSON:
+                result.json()
+                return CheckResult(True, 'Response parsed as JSON')
             else:
                 return CheckResult(result.status_code == 200, '%s returned %s (should be 200)' %
                                    (self.get_url(check), result.status_code))
@@ -79,12 +82,14 @@ class WebCheck(ServiceCheck):
     CONTENT_CONTAINS = 'contentContains'
     CONTENT_MATCHES = 'contentMatches'
     CONTENT_HASH = 'contentHash'
+    CONTENT_JSON = 'contentJson'
 
     DEFAULT_VALUES = {
         STATUS: 2,
         CONTENT_CONTAINS: 5,
         CONTENT_MATCHES: 5,
-        CONTENT_HASH: 10
+        CONTENT_HASH: 10,
+        CONTENT_JSON: 5
     }
 
     def __init__(self, protocol, path, content, check_mode, value=None):
@@ -106,5 +111,9 @@ class WebCheck(ServiceCheck):
             check = 'returns a page containing the expected content for %s' % self.service.get_url(self)
         elif self.check_mode == WebCheck.CONTENT_HASH:
             check = 'returns a page with the exact specified content'
+        elif self.check_mode == WebCheck.CONTENT_JSON:
+            check = 'returns proper json'
+        else:
+            check = 'works'
 
         return 'Check that the web server %s.' % check
