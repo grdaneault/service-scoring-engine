@@ -31,7 +31,7 @@ class LdapService(Service):
         try:
             server = Server(self.host, get_info=ALL)
             connection = Connection(server, auto_bind=True)
-            if check.expected_info in server.info:
+            if check.expected_info in str(server.info).lower():
                 return CheckResult(True, 'Successful ldap verification.')
             else:
                 return CheckResult(False, 'LDAP Server missing info \'%s\'' % check.expected_info)
@@ -44,7 +44,7 @@ class LdapService(Service):
 
 
 class LdapCheck(ServiceCheck):
-    __tablename__ = 'check_detail_imap'
+    __tablename__ = 'check_detail_ldap'
     __mapper_args__ = {'polymorphic_identity': 'ldap'}
 
     imap_check_id = Column('id', Integer, ForeignKey('service_check.id'), primary_key=True)
