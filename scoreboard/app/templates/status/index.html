@@ -44,7 +44,8 @@ CDT Stats
                             <h3>
                                 <span class="{{ service_result.status }} fa fa-{{ service_result.check_icon }}"></span>
                                 {% if not current_user.is_authenticated or current_user.team != team_round.team %}
-                                    <strong>{{ service_result.service.friendly_name() }}:</strong>
+                                    <a href="#"><strong>{{ service_result.service.friendly_name() }}</strong>
+                                    on {{service_result.service.host}}:</a>
                                     {{ service_result.get_service_score() }} / {{service_result.get_maximum_service_score() }}
                                 {% else %}
                                     <a href="{{ url_for('services.team_service_overview', service_id=service_result.service.id) }}">
