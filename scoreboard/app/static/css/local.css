@@ -1720,6 +1720,9 @@ fieldset[disabled] .form-control {
   background-color: #adafae;
   opacity: 1;
 }
+input.form-control {
+  color: #181818;
+}
 textarea.form-control {
   height: auto;
 }
