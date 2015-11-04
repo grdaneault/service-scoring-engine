@@ -6,7 +6,7 @@ import os
 class ConfigClass(object):
     # Flask settings
     SECRET_KEY = os.getenv('SECRET_KEY', 'THIS IS AN INSECURE SECRET')
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'mysql+mysqlconnector://greg:gregteambestteam1.@192.168.159.200/scoring_engine')
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'mysql+mysqlconnector://greg:greg@192.168.159.200/scoring_engine')
     CSRF_ENABLED = True
 
     USER_ENABLE_EMAIL = False
